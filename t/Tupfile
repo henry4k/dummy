@@ -1,0 +1,8 @@
+include_rules
+
+: foreach *.c |> !cc |> %B.o {c-objects}
+: foreach *.cpp |> !cxx |> %B.o {cpp-objects}
+
+LDFLAGS += ../test/test.a
+: foreach {c-objects} | ../test/test.a |> !ldcc |> %B
+: foreach {cpp-objects} | ../test/test.a |> !ldcxx |> %B
