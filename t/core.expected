@@ -1,4 +1,4 @@
-test case count = 8
+test case count = 10
 test case number = 0
 test case name = 'PassingTest'
 test case result = 'passed'
@@ -28,27 +28,41 @@ test case todo = 0
 test case todo reason = '(null)'
 test case done
 test case number = 4
+test case name = 'PassingRequireTest'
+test case result = 'passed'
+test case abort reason = '(null)'
+test case todo = 0
+test case todo reason = '(null)'
+test case done
+test case number = 5
+test case name = 'FailingRequireTest'
+test case result = 'failed'
+test case abort reason = '2+2 == 5 failed'
+test case todo = 0
+test case todo reason = '(null)'
+test case done
+test case number = 6
 test case name = 'SkipTest'
 test case result = 'skipped'
 test case abort reason = '(null)'
 test case todo = 0
 test case todo reason = '(null)'
 test case done
-test case number = 5
+test case number = 7
 test case name = 'SkipWithReasonTest'
 test case result = 'skipped'
 test case abort reason = 'Skipped with a reason'
 test case todo = 0
 test case todo reason = '(null)'
 test case done
-test case number = 6
+test case number = 8
 test case name = 'TodoTest'
 test case result = 'passed'
 test case abort reason = '(null)'
 test case todo = 1
 test case todo reason = '(null)'
 test case done
-test case number = 7
+test case number = 9
 test case name = 'TodoWithReasonTest'
 test case result = 'passed'
 test case abort reason = '(null)'

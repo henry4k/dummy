@@ -1,7 +1,7 @@
-#include <stdio.h> // setvbuf
 #include <stddef.h> // NULL
 #include <assert.h>
 #include "../test/core.h"
+#include "../test/require.h"
 #include "../test/max_reporter.h"
 
 void PassingTest()
@@ -21,6 +21,16 @@ void FailTest()
 void FailWithReasonTest()
 {
     testFailCase("Failed with a reason");
+}
+
+void PassingRequireTest()
+{
+    testRequire(2+2 == 4);
+}
+
+void FailingRequireTest()
+{
+    testRequire(2+2 == 5);
 }
 
 void SkipTest()
@@ -45,15 +55,13 @@ void TodoWithReasonTest()
 
 int main()
 {
-    // Disable buffering, so stdout and stderr are merged correctly
-    setvbuf(stdout, NULL, _IONBF, 0);
-    setvbuf(stderr, NULL, _IONBF, 0);
-
     testInit(testGetMaxReporter());
     testAddCase("PassingTest", PassingTest);
     testAddCase("AssertTest", AssertTest);
     testAddCase("FailTest", FailTest);
     testAddCase("FailWithReasonTest", FailWithReasonTest);
+    testAddCase("PassingRequireTest", PassingRequireTest);
+    testAddCase("FailingRequireTest", FailingRequireTest);
     testAddCase("SkipTest", SkipTest);
     testAddCase("SkipWithReasonTest", SkipWithReasonTest);
     testAddCase("TodoTest", TodoTest);
