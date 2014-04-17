@@ -33,6 +33,12 @@ typedef enum
     TEST_CASE_SKIPPED
 } testCaseResult;
 
+typedef enum
+{
+    TEST_FAIL_CASE,
+    TEST_SKIP_CASE
+} testAbortType;
+
 typedef struct
 {
     void* context;
@@ -127,30 +133,16 @@ int testCaseIsMarkedAsTodo();
 const char* testGetCaseTodoReason();
 
 /**
- * Marks current test case as failed and aborts it.
+ * Aborts current test case with the given reason.
  *
  * @param reason
- * Explains why the test case failed - this information is available
- * to the test reporter as abort reason.
- * May be `NULL` to signal an unknown reason.
+ * Explains why the test case was aborted - this information is available
+ * to the test reporter. May be `NULL` to signal an unknown reason.
  *
  * @return
  * Doesn't return.
  */
-void testFailCase( const char* reason );
-
-/**
- * Skips the current test case.
- *
- * @param reason
- * Explains why the test case was skipped - this information is available
- * to the test reporter as abort reason.
- * May be `NULL` to signal an unknown reason.
- *
- * @return
- * Doesn't return.
- */
-void testSkipCase( const char* reason );
+void testAbortCase( testAbortType type, const char* reason, ... );
 
 /**
  * Marks current test case as TODO.
@@ -164,7 +156,7 @@ void testSkipCase( const char* reason );
  * Calling this function more than once in a test case,
  * may overwrite the previous TDO reason.
  */
-void testMarkCaseAsTodo( const char* reason );
+void testMarkCaseAsTodo( const char* reason, ... );
 
 
 #ifdef __cplusplus

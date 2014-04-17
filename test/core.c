@@ -1,5 +1,7 @@
 #include <stdlib.h> // malloc, free
 #include <string.h> // memset, strncpy
+#include <stdio.h>  // testFormat etc
+#include <stdarg.h> // testFormat etc
 #include <signal.h>
 #include <setjmp.h>
 #include <stdbool.h>
@@ -267,30 +269,50 @@ const char* testGetCaseTodoReason()
     return NULL;
 }
 
-void testFailCase( const char* reason )
+const char* testFormatV( const char* format, va_list args )
+{
+    static char buffer[TEST_MAX_MESSAGE_LENGTH];
+    vsprintf(buffer, format, args);
+    return buffer;
+}
+
+void testAbortCase( testAbortType type, const char* reason, ... )
 {
     testCase* tc = testGetCurrentCase();
-    tc->result = TEST_CASE_FAILED;
+    switch(type)
+    {
+        case TEST_FAIL_CASE:
+            tc->result = TEST_CASE_FAILED;
+            break;
+
+        case TEST_SKIP_CASE:
+            tc->result = TEST_CASE_SKIPPED;
+            break;
+
+        default:
+            assert(!"Unknown abort type");
+    }
     if(reason)
-        strncpy(tc->abortReason, reason, TEST_MAX_MESSAGE_LENGTH);
+    {
+        va_list args;
+        va_start(args, reason);
+        strncpy(tc->abortReason, testFormatV(reason, args), TEST_MAX_MESSAGE_LENGTH);
+        va_end(args);
+    }
     abort();
 }
 
-void testSkipCase( const char* reason )
-{
-    testCase* tc = testGetCurrentCase();
-    tc->result = TEST_CASE_SKIPPED;
-    if(reason)
-        strncpy(tc->abortReason, reason, TEST_MAX_MESSAGE_LENGTH);
-    abort();
-}
-
-void testMarkCaseAsTodo( const char* reason )
+void testMarkCaseAsTodo( const char* reason, ... )
 {
     testCase* tc = testGetCurrentCase();
     tc->markedAsTodo = true;
     if(reason)
-        strncpy(tc->todoReason, reason, TEST_MAX_MESSAGE_LENGTH);
+    {
+        va_list args;
+        va_start(args, reason);
+        strncpy(tc->todoReason, testFormatV(reason, args), TEST_MAX_MESSAGE_LENGTH);
+        va_end(args);
+    }
 }
 
 

@@ -15,12 +15,12 @@ void AssertTest()
 
 void FailTest()
 {
-    testFailCase(NULL);
+    testAbortCase(TEST_FAIL_CASE, NULL);
 }
 
 void FailWithReasonTest()
 {
-    testFailCase("Failed with a reason");
+    testAbortCase(TEST_FAIL_CASE, "Failed with a reason");
 }
 
 void PassingRequireTest()
@@ -35,12 +35,12 @@ void FailingRequireTest()
 
 void SkipTest()
 {
-    testSkipCase(NULL);
+    testAbortCase(TEST_SKIP_CASE, NULL);
 }
 
 void SkipWithReasonTest()
 {
-    testSkipCase("Skipped with a reason");
+    testAbortCase(TEST_SKIP_CASE, "Skipped with a reason");
 }
 
 void TodoTest()

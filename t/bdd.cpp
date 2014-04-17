@@ -19,18 +19,18 @@ int main()
         .it("can't handle bloops", [](){
             testMarkCaseAsTodo("Implement exception");
             // test if bloops cause fizzbuzzer to fail
-            testSkipCase("Exception not implemented yet");
+            testAbortCase(TEST_SKIP_CASE, "Exception not implemented yet");
         });
 
     Describe("bloop")
         .it("can make a sound", [](){
             // emulate a sound
-            testFailCase("Bloop is silent!");
+            testAbortCase(TEST_FAIL_CASE, "Bloop is silent!");
         })
         .it("looks weird", [](){
             testMarkCaseAsTodo("Bloop needs to look weirder.");
             // bloops should always look weird
-            testFailCase("Bloop doesn't looks weird enough!");
+            testAbortCase(TEST_FAIL_CASE, "Bloop doesn't looks weird enough!");
         });
 
     testRun();
