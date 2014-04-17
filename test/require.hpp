@@ -6,97 +6,184 @@ namespace test
 
 // bool, long, double, string, void*
 
-class Comparison
+
+class Requirement
 {
 public:
-    Comparison( const char* expression );
+    Requirement( const char* expression );
 
 protected:
-    const char* m_Comparison;
+    const char* m_Expression;
 };
 
-class BoolComparison : public Comparison
+
+class BoolRequirement : public Requirement
 {
 public:
-    BoolComparison( const char* expression, bool value );
-    BoolComparison& is( bool value );
-    BoolComparison& equals( bool value );
+    BoolRequirement( const char* expression, bool value );
+    BoolRequirement& is( bool value );
+    BoolRequirement& isNot( bool value );
+    BoolRequirement& equals( bool value );
 
 private:
     bool m_Value;
 };
 
+class IntRequirement : public Requirement
+{
+public:
+    IntRequirement( const char* expression, long value );
+    IntRequirement& is( long value );
+    IntRequirement& isNot( long value );
+    IntRequirement& equals( long value );
+    IntRequirement& isGreaterThan( long value );
+    IntRequirement& isGreaterOrEqualTo( long value );
+    IntRequirement& isSmallerThan( long value );
+    IntRequirement& isSmallerOrEqualTo( long value );
+
+private:
+    long m_Value;
+};
+
+class FloatRequirement : public Requirement
+{
+public:
+    FloatRequirement( const char* expression, double value );
+    FloatRequirement& withEpsilon( double epsilon );
+    FloatRequirement& is( double value );
+    FloatRequirement& isNot( double value );
+    FloatRequirement& equals( double value );
+    FloatRequirement& isGreaterThan( double value );
+    FloatRequirement& isGreaterOrEqualTo( double value );
+    FloatRequirement& isSmallerThan( double value );
+    FloatRequirement& isSmallerOrEqualTo( double value );
+
+private:
+    double m_Value;
+    double m_Epsilon;
+};
+
+class StringRequirement : public Requirement
+{
+public:
+    StringRequirement( const char* expression, const char* value );
+    StringRequirement& is( const char* value );
+    StringRequirement& isNot( const char* value );
+    StringRequirement& equals( const char* value );
+    StringRequirement& beginsWith( const char* value );
+    StringRequirement& endsWith( const char* value );
+    StringRequirement& contains( const char* value );
+    StringRequirement& matches( const char* value );
+
+private:
+    const char* m_Value;
+};
+
+class PointerRequirement : public Requirement
+{
+public:
+    StringRequirement( const char* expression, const void* value );
+    StringRequirement& is( const void* value );
+    StringRequirement& isNot( const void* value );
+    StringRequirement& equals( const void* value );
+
+private:
+    const void* m_Value;
+};
+
 
 #define RequireThat( E ) RequireThat_(#E, E)
-BoolComparison RequireThat_( const char* expression, bool value );
+BoolRequirement RequireThat_( const char* expression, bool value );
+IntRequirement RequireThat_( const char* expression, long value );
+FloatRequirement RequireThat_( const char* expression, double value );
+StringRequirement RequireThat_( const char* expression, const char* value );
+PointerRequirement RequireThat_( const char* expression, const void* value );
 
 
 // ---- bool implementation ----
 
-BoolComparison::BoolComparison( const char* expression, bool value ) :
-    Comparison(expression),
+BoolRequirement::BoolRequirement( const char* expression, bool value ) :
+    Requirement(expression),
     m_Value(value)
 {
 }
 
-BoolComparison& BoolComparison::is( bool value )
-{
-    return equals(value);
-}
-
-BoolComparison& BoolComparison::equals( bool value )
+BoolRequirement& BoolRequirement::is( bool value )
 {
     const char* expected = (value == true) ? "true" : "false";
     const char* got = (m_Value == true) ? "true" : "false";
 
     if(m_Value != value)
-        testFail("Expected %s to be %s, but it was %s.",
-            m_Comparison,
+        testAbortCase(TEST_FAIL_CASE, "Expected %s to be %s, but it was %s.",
+            m_Expression,
             expected,
             got);
     return *this;
 }
 
-BoolComparison RequireThat_( const char* expression, bool value )
+BoolRequirement& BoolRequirement::isNot( bool value )
 {
-    return BoolComparison(expression, value);
+    const char* expected = (value == true) ? "true" : "false";
+    const char* got = (m_Value == true) ? "true" : "false";
+
+    if(m_Value == value)
+        testAbortCase(TEST_FAIL_CASE, "Expected %s to be %s, but it was %s.",
+            m_Expression,
+            expected,
+            got);
+    return *this;
+}
+
+BoolRequirement& BoolRequirement::equals( bool value )
+{
+    return is(value);
+}
+
+BoolRequirement RequireThat_( const char* expression, bool value )
+{
+    return BoolRequirement(expression, value);
 }
 
 
 // ---- int implementation ----
 
-IntComparison::IntComparison( const char* expression, long value ) :
-    Comparison(expression),
+IntRequirement::IntRequirement( const char* expression, long value ) :
+    Requirement(expression),
     m_Value(value)
 {
 }
 
-BoolComparison& BoolComparison::isTrue()
+IntRequirement( const char* expression, long value )
 {
-    return equals(true);
+
 }
 
-BoolComparison& BoolComparison::isFalse()
+IntRequirement& IntRequirement::is( long value )
 {
-    return equals(false);
 }
 
-BoolComparison& BoolComparison::equals( bool value )
+IntRequirement& IntRequirement::isNot( long value )
 {
-    const char* expected = (value == true) ? "true" : "false";
-    const char* got = (m_Value == true) ? "true" : "false";
-
-    if(m_Value != value)
-        testFail("Expected %s to be %s, but it was %s.",
-            m_Comparison,
-            expected,
-            got);
-    return *this;
 }
 
-BoolComparison RequireThat_( const char* expression, bool value )
+IntRequirement& IntRequirement::equals( long value )
 {
-    return BoolComparison(expression, value);
+}
+
+IntRequirement& IntRequirement::isGreaterThan( long value )
+{
+}
+
+IntRequirement& IntRequirement::isGreaterOrEqualTo( long value )
+{
+}
+
+IntRequirement& IntRequirement::isSmallerThan( long value )
+{
+}
+
+IntRequirement& IntRequirement::isSmallerOrEqualTo( long value )
+{
 }
 
 
