@@ -1,7 +1,7 @@
-#ifndef __LAMER_REQUIRE_HPP__
-#define __LAMER_REQUIRE_HPP__
+#ifndef __DUMMY_REQUIRE_HPP__
+#define __DUMMY_REQUIRE_HPP__
 
-namespace lamer
+namespace dummy
 {
 
 // bool, long, double, string, void*
@@ -114,7 +114,7 @@ BoolRequirement& BoolRequirement::is( bool value )
     const char* got = (m_Value == true) ? "true" : "false";
 
     if(m_Value != value)
-        lamerAbortTest(LAMER_FAIL_TEST, "Expected %s to be %s, but it was %s.",
+        dummyAbortTest(DUMMY_FAIL_TEST, "Expected %s to be %s, but it was %s.",
             m_Expression,
             expected,
             got);
@@ -127,7 +127,7 @@ BoolRequirement& BoolRequirement::isNot( bool value )
     const char* got = (m_Value == true) ? "true" : "false";
 
     if(m_Value == value)
-        lamerAbortTest(LAMER_FAIL_TEST, "Expected %s to be %s, but it was %s.",
+        dummyAbortTest(DUMMY_FAIL_TEST, "Expected %s to be %s, but it was %s.",
             m_Expression,
             expected,
             got);

@@ -1,7 +1,7 @@
 #include <stdlib.h> // malloc, free
 #include <string.h> // memset, strncpy
-#include <stdio.h>  // lamerFormat etc
-#include <stdarg.h> // lamerFormat etc
+#include <stdio.h>  // dummyFormat etc
+#include <stdarg.h> // dummyFormat etc
 #include <signal.h>
 #include <setjmp.h>
 #include <stdbool.h>
@@ -11,15 +11,15 @@
 
 enum
 {
-    LAMER_MAX_MESSAGE_LENGTH = 127,
-    LAMER_MAX_CLEANUPS = 32,
-    LAMER_MAX_TESTS = 32,
-    LAMER_MAX_ENVIRONMENTS = 16,
-    LAMER_INVALID_TEST_INDEX = -1
+    DUMMY_MAX_MESSAGE_LENGTH = 127,
+    DUMMY_MAX_CLEANUPS = 32,
+    DUMMY_MAX_TESTS = 32,
+    DUMMY_MAX_ENVIRONMENTS = 16,
+    DUMMY_INVALID_TEST_INDEX = -1
 };
 
 
-typedef void (*lamerCleanupFunction)( void* data );
+typedef void (*dummyCleanupFunction)( void* data );
 
 /**
  * Is called after the test has been completed -
@@ -27,58 +27,58 @@ typedef void (*lamerCleanupFunction)( void* data );
  */
 typedef struct
 {
-    lamerCleanupFunction fn;
+    dummyCleanupFunction fn;
     void* data;
-} lamerCleanup;
+} dummyCleanup;
 
 typedef struct
 {
-    char name[LAMER_MAX_MESSAGE_LENGTH];
-    lamerTestFunction fn;
-    lamerTestStatus status;
+    char name[DUMMY_MAX_MESSAGE_LENGTH];
+    dummyTestFunction fn;
+    dummyTestStatus status;
 
-    lamerTestResult result;
-    char abortReason[LAMER_MAX_MESSAGE_LENGTH];
+    dummyTestResult result;
+    char abortReason[DUMMY_MAX_MESSAGE_LENGTH];
 
     bool markedAsTodo;
-    char todoReason[LAMER_MAX_MESSAGE_LENGTH];
+    char todoReason[DUMMY_MAX_MESSAGE_LENGTH];
 
-    lamerCleanup cleanupStack[LAMER_MAX_CLEANUPS];
+    dummyCleanup cleanupStack[DUMMY_MAX_CLEANUPS];
     int cleanupStackSize;
-} lamerTest;
+} dummyTest;
 
 typedef struct
 {
     jmp_buf jumpBuffer;
-} lamerEnvironment;
+} dummyEnvironment;
 
 typedef struct
 {
-    const lamerReporter* reporter;
-    lamerStatus status;
+    const dummyReporter* reporter;
+    dummyStatus status;
 
-    lamerTest tests[LAMER_MAX_TESTS];
+    dummyTest tests[DUMMY_MAX_TESTS];
     int testCount;
 
     int currentTestIndex;
 
-    lamerEnvironment environmentStack[LAMER_MAX_ENVIRONMENTS];
+    dummyEnvironment environmentStack[DUMMY_MAX_ENVIRONMENTS];
     int environmentStackSize;
-} lamerContext;
+} dummyContext;
 
 
-lamerContext* lamerCurrentContext = NULL;
+dummyContext* dummyCurrentContext = NULL;
 
 
-bool lamerRunTest( int index );
-bool lamerProtectedCall( lamerTestFunction fn );
-void lamerSignalHandler( int signal );
+bool dummyRunTest( int index );
+bool dummyProtectedCall( dummyTestFunction fn );
+void dummySignalHandler( int signal );
 
-void lamerInit( const lamerReporter* reporter )
+void dummyInit( const dummyReporter* reporter )
 {
-    assert(lamerCurrentContext == NULL);
-    lamerCurrentContext = malloc(sizeof(lamerContext));
-    memset(lamerCurrentContext, 0, sizeof(lamerContext));
+    assert(dummyCurrentContext == NULL);
+    dummyCurrentContext = malloc(sizeof(dummyContext));
+    memset(dummyCurrentContext, 0, sizeof(dummyContext));
 
     assert(reporter);
     assert(reporter->began);
@@ -86,48 +86,48 @@ void lamerInit( const lamerReporter* reporter )
     assert(reporter->beganTest);
     assert(reporter->completedTest);
     assert(reporter->diag);
-    lamerCurrentContext->reporter = reporter;
+    dummyCurrentContext->reporter = reporter;
 
-    lamerCurrentContext->status = LAMER_INITIALIZING;
-    lamerCurrentContext->currentTestIndex = LAMER_INVALID_TEST_INDEX;
+    dummyCurrentContext->status = DUMMY_INITIALIZING;
+    dummyCurrentContext->currentTestIndex = DUMMY_INVALID_TEST_INDEX;
 }
 
-int lamerRunTests()
+int dummyRunTests()
 {
-    lamerContext* ctx = lamerCurrentContext;
+    dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
-    assert(ctx->status == LAMER_INITIALIZING);
+    assert(ctx->status == DUMMY_INITIALIZING);
 
     ctx->reporter->began(ctx->reporter->context);
 
-    ctx->status = LAMER_RUNNING;
+    ctx->status = DUMMY_RUNNING;
     int failedTests = 0;
     int i = 0;
     for(; i < ctx->testCount; i++)
-        if(lamerRunTest(i) == false)
+        if(dummyRunTest(i) == false)
             failedTests++;
 
-    ctx->status = LAMER_COMPLETED;
+    ctx->status = DUMMY_COMPLETED;
     ctx->reporter->completed(ctx->reporter->context);
 
-    assert(ctx->status == LAMER_COMPLETED);
+    assert(ctx->status == DUMMY_COMPLETED);
     free(ctx);
-    lamerCurrentContext = NULL;
+    dummyCurrentContext = NULL;
 
     return failedTests;
 }
 
-int lamerAddTest( const char* name, lamerTestFunction fn )
+int dummyAddTest( const char* name, dummyTestFunction fn )
 {
-    lamerContext* ctx = lamerCurrentContext;
+    dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
-    assert(ctx->status == LAMER_INITIALIZING);
-    assert(ctx->testCount < LAMER_MAX_TESTS);
+    assert(ctx->status == DUMMY_INITIALIZING);
+    assert(ctx->testCount < DUMMY_MAX_TESTS);
 
-    lamerTest* tc = &ctx->tests[ctx->testCount];
-    memset(tc, 0, sizeof(lamerTest));
+    dummyTest* tc = &ctx->tests[ctx->testCount];
+    memset(tc, 0, sizeof(dummyTest));
 
-    strncpy(tc->name, name, LAMER_MAX_MESSAGE_LENGTH);
+    strncpy(tc->name, name, DUMMY_MAX_MESSAGE_LENGTH);
     tc->fn = fn;
 
     ctx->testCount++;
@@ -135,32 +135,32 @@ int lamerAddTest( const char* name, lamerTestFunction fn )
     return ctx->testCount-1;
 }
 
-bool lamerRunTest( int index )
+bool dummyRunTest( int index )
 {
-    lamerContext* ctx = lamerCurrentContext;
+    dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
-    assert(ctx->status == LAMER_RUNNING);
+    assert(ctx->status == DUMMY_RUNNING);
 
     assert(index >= 0);
-    assert(index < LAMER_MAX_TESTS);
-    lamerTest* tc = &ctx->tests[index];
+    assert(index < DUMMY_MAX_TESTS);
+    dummyTest* tc = &ctx->tests[index];
 
     // prepare
     ctx->currentTestIndex = index;
-    tc->status = LAMER_TEST_STARTING;
-    tc->result = LAMER_TEST_PASSED;
+    tc->status = DUMMY_TEST_STARTING;
+    tc->result = DUMMY_TEST_PASSED;
     ctx->reporter->beganTest(ctx->reporter->context);
-    signal(SIGABRT, lamerSignalHandler);
-    signal(SIGFPE, lamerSignalHandler);
-    signal(SIGILL, lamerSignalHandler);
-    signal(SIGSEGV, lamerSignalHandler);
+    signal(SIGABRT, dummySignalHandler);
+    signal(SIGFPE, dummySignalHandler);
+    signal(SIGILL, dummySignalHandler);
+    signal(SIGSEGV, dummySignalHandler);
 
     // run
-    tc->status = LAMER_TEST_RUNNING;
-    const bool passed = lamerProtectedCall(tc->fn);
-    if(!passed && tc->result == LAMER_TEST_PASSED)
-        tc->result = LAMER_TEST_FAILED;
-    tc->status = LAMER_TEST_COMPLETED;
+    tc->status = DUMMY_TEST_RUNNING;
+    const bool passed = dummyProtectedCall(tc->fn);
+    if(!passed && tc->result == DUMMY_TEST_PASSED)
+        tc->result = DUMMY_TEST_FAILED;
+    tc->status = DUMMY_TEST_COMPLETED;
 
     // cleanup
     signal(SIGABRT, SIG_DFL);
@@ -168,79 +168,79 @@ bool lamerRunTest( int index )
     signal(SIGILL, SIG_DFL);
     signal(SIGSEGV, SIG_DFL);
     ctx->reporter->completedTest(ctx->reporter->context);
-    ctx->currentTestIndex = LAMER_INVALID_TEST_INDEX;
-    tc->status = LAMER_TEST_UNDEFINED;
+    ctx->currentTestIndex = DUMMY_INVALID_TEST_INDEX;
+    tc->status = DUMMY_TEST_UNDEFINED;
 
     return passed;
 }
 
-lamerStatus lamerGetStatus()
+dummyStatus dummyGetStatus()
 {
-    lamerContext* ctx = lamerCurrentContext;
+    dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
 
     return ctx->status;
 }
 
-int lamerGetTestCount()
+int dummyGetTestCount()
 {
-    const lamerContext* ctx = lamerCurrentContext;
+    const dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
 
     return ctx->testCount;
 }
 
-int lamerGetTestNumber()
+int dummyGetTestNumber()
 {
-    const lamerContext* ctx = lamerCurrentContext;
+    const dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
 
     assert(ctx->currentTestIndex >= 0);
-    assert(ctx->currentTestIndex < LAMER_MAX_TESTS);
+    assert(ctx->currentTestIndex < DUMMY_MAX_TESTS);
 
     return ctx->currentTestIndex;
 }
 
-lamerTest* lamerGetCurrentTest()
+dummyTest* dummyGetCurrentTest()
 {
-    lamerContext* ctx = lamerCurrentContext;
+    dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
 
     assert(ctx->currentTestIndex >= 0);
-    assert(ctx->currentTestIndex < LAMER_MAX_TESTS);
-    lamerTest* tc = &ctx->tests[ctx->currentTestIndex];
+    assert(ctx->currentTestIndex < DUMMY_MAX_TESTS);
+    dummyTest* tc = &ctx->tests[ctx->currentTestIndex];
 
     return tc;
 }
 
-const char* lamerGetTestName()
+const char* dummyGetTestName()
 {
-    const lamerTest* tc = lamerGetCurrentTest();
+    const dummyTest* tc = dummyGetCurrentTest();
     assert(tc->name);
-    assert(strlen(tc->name) < LAMER_MAX_MESSAGE_LENGTH);
+    assert(strlen(tc->name) < DUMMY_MAX_MESSAGE_LENGTH);
     return tc->name;
 }
 
-lamerTestStatus lamerGetTestStatus()
+dummyTestStatus dummyGetTestStatus()
 {
-    return lamerGetCurrentTest()->status;
+    return dummyGetCurrentTest()->status;
 }
 
-lamerTestResult lamerGetTestResult()
+dummyTestResult dummyGetTestResult()
 {
-    const lamerTest* tc = lamerGetCurrentTest();
-    assert(tc->status == LAMER_TEST_COMPLETED);
+    const dummyTest* tc = dummyGetCurrentTest();
+    assert(tc->status == DUMMY_TEST_COMPLETED);
     return tc->result;
 }
 
-const char* lamerGetTestAbortReason()
+const char* dummyGetTestAbortReason()
 {
-    const lamerTest* tc = lamerGetCurrentTest();
-    if(tc->status == LAMER_TEST_COMPLETED)
+    const dummyTest* tc = dummyGetCurrentTest();
+    if(tc->status == DUMMY_TEST_COMPLETED)
     {
         assert(tc->abortReason);
         const int length = strlen(tc->abortReason);
-        assert(length < LAMER_MAX_MESSAGE_LENGTH);
+        assert(length < DUMMY_MAX_MESSAGE_LENGTH);
         if(length > 0)
             return tc->abortReason;
     }
@@ -248,20 +248,20 @@ const char* lamerGetTestAbortReason()
     return NULL;
 }
 
-int lamerTestIsMarkedAsTodo()
+int dummyTestIsMarkedAsTodo()
 {
-    return lamerGetCurrentTest()->markedAsTodo;
+    return dummyGetCurrentTest()->markedAsTodo;
 }
 
-const char* lamerGetTestTodoReason()
+const char* dummyGetTestTodoReason()
 {
-    const lamerTest* tc = lamerGetCurrentTest();
+    const dummyTest* tc = dummyGetCurrentTest();
 
     if(tc->markedAsTodo)
     {
         assert(tc->todoReason);
         const int length = strlen(tc->todoReason);
-        assert(length < LAMER_MAX_MESSAGE_LENGTH);
+        assert(length < DUMMY_MAX_MESSAGE_LENGTH);
         if(length > 0)
             return tc->todoReason;
     }
@@ -269,24 +269,24 @@ const char* lamerGetTestTodoReason()
     return NULL;
 }
 
-const char* lamerFormatV( const char* format, va_list args )
+const char* dummyFormatV( const char* format, va_list args )
 {
-    static char buffer[LAMER_MAX_MESSAGE_LENGTH];
+    static char buffer[DUMMY_MAX_MESSAGE_LENGTH];
     vsprintf(buffer, format, args);
     return buffer;
 }
 
-void lamerAbortTest( lamerTestAbortType type, const char* reason, ... )
+void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
 {
-    lamerTest* tc = lamerGetCurrentTest();
+    dummyTest* tc = dummyGetCurrentTest();
     switch(type)
     {
-        case LAMER_FAIL_TEST:
-            tc->result = LAMER_TEST_FAILED;
+        case DUMMY_FAIL_TEST:
+            tc->result = DUMMY_TEST_FAILED;
             break;
 
-        case LAMER_SKIP_TEST:
-            tc->result = LAMER_TEST_SKIPPED;
+        case DUMMY_SKIP_TEST:
+            tc->result = DUMMY_TEST_SKIPPED;
             break;
 
         default:
@@ -296,21 +296,21 @@ void lamerAbortTest( lamerTestAbortType type, const char* reason, ... )
     {
         va_list args;
         va_start(args, reason);
-        strncpy(tc->abortReason, lamerFormatV(reason, args), LAMER_MAX_MESSAGE_LENGTH);
+        strncpy(tc->abortReason, dummyFormatV(reason, args), DUMMY_MAX_MESSAGE_LENGTH);
         va_end(args);
     }
     abort();
 }
 
-void lamerMarkTestAsTodo( const char* reason, ... )
+void dummyMarkTestAsTodo( const char* reason, ... )
 {
-    lamerTest* tc = lamerGetCurrentTest();
+    dummyTest* tc = dummyGetCurrentTest();
     tc->markedAsTodo = true;
     if(reason)
     {
         va_list args;
         va_start(args, reason);
-        strncpy(tc->todoReason, lamerFormatV(reason, args), LAMER_MAX_MESSAGE_LENGTH);
+        strncpy(tc->todoReason, dummyFormatV(reason, args), DUMMY_MAX_MESSAGE_LENGTH);
         va_end(args);
     }
 }
@@ -318,9 +318,9 @@ void lamerMarkTestAsTodo( const char* reason, ... )
 
 // ----- protected call -----
 
-lamerEnvironment* lamerGetCurrentEnvironment()
+dummyEnvironment* dummyGetCurrentEnvironment()
 {
-    lamerContext* ctx = lamerCurrentContext;
+    dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
 
     if(ctx->environmentStackSize > 0)
@@ -329,40 +329,40 @@ lamerEnvironment* lamerGetCurrentEnvironment()
         return NULL;
 }
 
-lamerEnvironment* lamerPushEnvironment()
+dummyEnvironment* dummyPushEnvironment()
 {
-    lamerContext* ctx = lamerCurrentContext;
+    dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
 
     ctx->environmentStackSize++;
-    assert(ctx->environmentStackSize <= LAMER_MAX_ENVIRONMENTS);
+    assert(ctx->environmentStackSize <= DUMMY_MAX_ENVIRONMENTS);
 
-    lamerEnvironment* environment = lamerGetCurrentEnvironment();
-    memset(environment, 0, sizeof(lamerEnvironment));
+    dummyEnvironment* environment = dummyGetCurrentEnvironment();
+    memset(environment, 0, sizeof(dummyEnvironment));
     return environment;
 }
 
-lamerEnvironment* lamerPopEnvironment()
+dummyEnvironment* dummyPopEnvironment()
 {
-    lamerContext* ctx = lamerCurrentContext;
+    dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
 
     assert(ctx->environmentStackSize > 0);
-    lamerEnvironment* environment = lamerGetCurrentEnvironment();
+    dummyEnvironment* environment = dummyGetCurrentEnvironment();
     ctx->environmentStackSize--;
     return environment;
 }
 
-void lamerSignalHandler( int signal )
+void dummySignalHandler( int signal )
 {
-    lamerEnvironment* environment = lamerGetCurrentEnvironment();
+    dummyEnvironment* environment = dummyGetCurrentEnvironment();
     if(environment)
         longjmp(environment->jumpBuffer, 1);
 }
 
-bool lamerProtectedCall( lamerTestFunction fn )
+bool dummyProtectedCall( dummyTestFunction fn )
 {
-    lamerEnvironment* environment = lamerPushEnvironment();
+    dummyEnvironment* environment = dummyPushEnvironment();
     const int jumpResult = setjmp(environment->jumpBuffer);
     if(jumpResult == 0)
     {
@@ -372,6 +372,6 @@ bool lamerProtectedCall( lamerTestFunction fn )
     {
         // fn aborted
     }
-    lamerPopEnvironment();
+    dummyPopEnvironment();
     return jumpResult == 0;
 }

@@ -1,4 +1,4 @@
-lamer
+dummy
 =====
 
 A flexible test framework for C.

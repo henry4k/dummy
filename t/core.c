@@ -1,8 +1,8 @@
 #include <stddef.h> // NULL
 #include <assert.h>
-#include "../lamer/core.h"
-#include "../lamer/require.h"
-#include "../lamer/max_reporter.h"
+#include "../dummy/core.h"
+#include "../dummy/require.h"
+#include "../dummy/max_reporter.h"
 
 void PassingTest()
 {
@@ -15,57 +15,57 @@ void AssertTest()
 
 void FailTest()
 {
-    lamerAbortTest(LAMER_FAIL_TEST, NULL);
+    dummyAbortTest(DUMMY_FAIL_TEST, NULL);
 }
 
 void FailWithReasonTest()
 {
-    lamerAbortTest(LAMER_FAIL_TEST, "Failed with a reason");
+    dummyAbortTest(DUMMY_FAIL_TEST, "Failed with a reason");
 }
 
 void PassingRequireTest()
 {
-    lamerRequire(2+2 == 4);
+    dummyRequire(2+2 == 4);
 }
 
 void FailingRequireTest()
 {
-    lamerRequire(2+2 == 5);
+    dummyRequire(2+2 == 5);
 }
 
 void SkipTest()
 {
-    lamerAbortTest(LAMER_SKIP_TEST, NULL);
+    dummyAbortTest(DUMMY_SKIP_TEST, NULL);
 }
 
 void SkipWithReasonTest()
 {
-    lamerAbortTest(LAMER_SKIP_TEST, "Skipped with a reason");
+    dummyAbortTest(DUMMY_SKIP_TEST, "Skipped with a reason");
 }
 
 void TodoTest()
 {
-    lamerMarkTestAsTodo(NULL);
+    dummyMarkTestAsTodo(NULL);
 }
 
 void TodoWithReasonTest()
 {
-    lamerMarkTestAsTodo("TODO with a reason");
+    dummyMarkTestAsTodo("TODO with a reason");
 }
 
 int main()
 {
-    lamerInit(lamerGetMaxReporter());
-    lamerAddTest("PassingTest", PassingTest);
-    lamerAddTest("AssertTest", AssertTest);
-    lamerAddTest("FailTest", FailTest);
-    lamerAddTest("FailWithReasonTest", FailWithReasonTest);
-    lamerAddTest("PassingRequireTest", PassingRequireTest);
-    lamerAddTest("FailingRequireTest", FailingRequireTest);
-    lamerAddTest("SkipTest", SkipTest);
-    lamerAddTest("SkipWithReasonTest", SkipWithReasonTest);
-    lamerAddTest("TodoTest", TodoTest);
-    lamerAddTest("TodoWithReasonTest", TodoWithReasonTest);
-    lamerRunTests();
+    dummyInit(dummyGetMaxReporter());
+    dummyAddTest("PassingTest", PassingTest);
+    dummyAddTest("AssertTest", AssertTest);
+    dummyAddTest("FailTest", FailTest);
+    dummyAddTest("FailWithReasonTest", FailWithReasonTest);
+    dummyAddTest("PassingRequireTest", PassingRequireTest);
+    dummyAddTest("FailingRequireTest", FailingRequireTest);
+    dummyAddTest("SkipTest", SkipTest);
+    dummyAddTest("SkipWithReasonTest", SkipWithReasonTest);
+    dummyAddTest("TodoTest", TodoTest);
+    dummyAddTest("TodoWithReasonTest", TodoWithReasonTest);
+    dummyRunTests();
     return 0;
 }

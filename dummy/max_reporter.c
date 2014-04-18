@@ -11,7 +11,7 @@ static void began( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
     fprintf(ctx->file, "test count = %d\n",
-        lamerGetTestCount()
+        dummyGetTestCount()
     );
 }
 
@@ -25,10 +25,10 @@ static void beganTest( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
     fprintf(ctx->file, "test number = %d\n",
-        lamerGetTestNumber()
+        dummyGetTestNumber()
     );
     fprintf(ctx->file, "test name = '%s'\n",
-        lamerGetTestName()
+        dummyGetTestName()
     );
 }
 
@@ -37,17 +37,17 @@ static void completedTest( void* ctx_ )
     const Context* ctx = (Context*)ctx_;
 
     const char* result = NULL;
-    switch(lamerGetTestResult())
+    switch(dummyGetTestResult())
     {
-        case LAMER_TEST_PASSED:
+        case DUMMY_TEST_PASSED:
             result = "passed";
             break;
 
-        case LAMER_TEST_FAILED:
+        case DUMMY_TEST_FAILED:
             result = "failed";
             break;
 
-        case LAMER_TEST_SKIPPED:
+        case DUMMY_TEST_SKIPPED:
             result = "skipped";
             break;
 
@@ -58,14 +58,14 @@ static void completedTest( void* ctx_ )
         result
     );
     fprintf(ctx->file, "test abort reason = '%s'\n",
-        lamerGetTestAbortReason()
+        dummyGetTestAbortReason()
     );
 
     fprintf(ctx->file, "test todo = %d\n",
-        lamerTestIsMarkedAsTodo()
+        dummyTestIsMarkedAsTodo()
     );
     fprintf(ctx->file, "test todo reason = '%s'\n",
-        lamerGetTestTodoReason()
+        dummyGetTestTodoReason()
     );
 
     fprintf(ctx->file, "test done\n");
@@ -79,10 +79,10 @@ static void diag( void* ctx_, const char* message )
     );
 }
 
-const lamerReporter* lamerGetMaxReporter()
+const dummyReporter* dummyGetMaxReporter()
 {
     static Context ctx;
-    static lamerReporter reporter;
+    static dummyReporter reporter;
 
     ctx.file = stdout;
 

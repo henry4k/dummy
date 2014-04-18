@@ -1,5 +1,5 @@
-#ifndef __LAMER_CORE_H__
-#define __LAMER_CORE_H__
+#ifndef __DUMMY_CORE_H__
+#define __DUMMY_CORE_H__
 
 #ifdef __cplusplus
 extern "C"
@@ -8,36 +8,36 @@ extern "C"
 
 enum
 {
-    LAMER_UNKNOWN_TEST_COUNT = -1
+    DUMMY_UNKNOWN_TEST_COUNT = -1
 };
 
 typedef enum
 {
-    LAMER_INITIALIZING,
-    LAMER_RUNNING,
-    LAMER_COMPLETED
-} lamerStatus;
+    DUMMY_INITIALIZING,
+    DUMMY_RUNNING,
+    DUMMY_COMPLETED
+} dummyStatus;
 
 typedef enum
 {
-    LAMER_TEST_UNDEFINED,
-    LAMER_TEST_STARTING,
-    LAMER_TEST_RUNNING,
-    LAMER_TEST_COMPLETED
-} lamerTestStatus;
+    DUMMY_TEST_UNDEFINED,
+    DUMMY_TEST_STARTING,
+    DUMMY_TEST_RUNNING,
+    DUMMY_TEST_COMPLETED
+} dummyTestStatus;
 
 typedef enum
 {
-    LAMER_TEST_PASSED,
-    LAMER_TEST_FAILED,
-    LAMER_TEST_SKIPPED
-} lamerTestResult;
+    DUMMY_TEST_PASSED,
+    DUMMY_TEST_FAILED,
+    DUMMY_TEST_SKIPPED
+} dummyTestResult;
 
 typedef enum
 {
-    LAMER_FAIL_TEST,
-    LAMER_SKIP_TEST
-} lamerTestAbortType;
+    DUMMY_FAIL_TEST,
+    DUMMY_SKIP_TEST
+} dummyTestAbortType;
 
 typedef struct
 {
@@ -50,19 +50,19 @@ typedef struct
     void (*completedTest)( void* context );
 
     void (*diag)( void* context, const char* message );
-} lamerReporter;
+} dummyReporter;
 
 
 /**
  * Initializes the test context.
  *
  * This needs to be called before any calls to other test functions.
- * The initial context status is `LAMER_INITIALIZING`.
+ * The initial context status is `DUMMY_INITIALIZING`.
  *
  * @param reporter
  * Reporter which will be used by the created context.
  */
-void lamerInit( const lamerReporter* reporter );
+void dummyInit( const dummyReporter* reporter );
 
 /**
  * Runs all added tests and destroys the current context.
@@ -70,12 +70,12 @@ void lamerInit( const lamerReporter* reporter );
  * @return
  * Number of test tests, that failed.
  */
-int lamerRunTests();
+int dummyRunTests();
 
 /**
  * Function that is called for a test.
  */
-typedef void (*lamerTestFunction)();
+typedef void (*dummyTestFunction)();
 
 /**
  * Adds a test to the current context.
@@ -85,52 +85,52 @@ typedef void (*lamerTestFunction)();
  *
  * @param fn
  * Is called when the test is being run.
- * See #lamerRunTests
+ * See #dummyRunTests
  *
  * @return
  * Id of the test.
  */
-int lamerAddTest( const char* name, lamerTestFunction fn );
+int dummyAddTest( const char* name, dummyTestFunction fn );
 
 /**
  * Status of the current context.
  */
-lamerStatus lamerGetStatus();
+dummyStatus dummyGetStatus();
 
 /**
  * Count of tests added to the current context.
  */
-int lamerGetTestCount();
+int dummyGetTestCount();
 
 /**
  * Name of the active test in the current context.
  */
-const char* lamerGetTestName();
+const char* dummyGetTestName();
 
 /**
  * Id of the active test in the current context.
  */
-int lamerGetTestNumber();
+int dummyGetTestNumber();
 
 /**
  * Status of the active test in the current context.
  */
-lamerTestStatus lamerGetTestStatus();
+dummyTestStatus dummyGetTestStatus();
 
 /**
  * TODO
  */
-lamerTestResult lamerGetTestResult();
+dummyTestResult dummyGetTestResult();
 
 /**
  * Message describing why the current test aborted
  * or `NULL` if the test hasn't failed (yet).
  */
-const char* lamerGetTestAbortReason();
+const char* dummyGetTestAbortReason();
 
-int lamerTestIsMarkedAsTodo();
+int dummyTestIsMarkedAsTodo();
 
-const char* lamerGetTestTodoReason();
+const char* dummyGetTestTodoReason();
 
 /**
  * Aborts current test with the given reason.
@@ -142,7 +142,7 @@ const char* lamerGetTestTodoReason();
  * @return
  * Doesn't return.
  */
-void lamerAbortTest( lamerTestAbortType type, const char* reason, ... );
+void dummyAbortTest( dummyTestAbortType type, const char* reason, ... );
 
 /**
  * Marks current test as TODO.
@@ -156,7 +156,7 @@ void lamerAbortTest( lamerTestAbortType type, const char* reason, ... );
  * Calling this function more than once in a test,
  * may overwrite the previous TODO reason.
  */
-void lamerMarkTestAsTodo( const char* reason, ... );
+void dummyMarkTestAsTodo( const char* reason, ... );
 
 
 #ifdef __cplusplus

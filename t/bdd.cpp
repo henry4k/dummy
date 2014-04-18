@@ -1,37 +1,37 @@
-#include "../lamer/core.h"
-#include "../lamer/max_reporter.h"
-#include "../lamer/bdd.hpp"
+#include "../dummy/core.h"
+#include "../dummy/max_reporter.h"
+#include "../dummy/bdd.hpp"
 
-using namespace lamer;
+using namespace dummy;
 
 int main()
 {
-    lamerInit(lamerGetMaxReporter());
+    dummyInit(dummyGetMaxReporter());
 
     Describe("fizzbuzzer module")
         .it("does things", [](){
             // try doing things here
         })
         .it("is a slacker", [](){
-            lamerMarkTestAsTodo("Implement lazyness");
+            dummyMarkTestAsTodo("Implement lazyness");
             // prove that fizzbuzzer is lazy as fuck
         })
         .it("can't handle bloops", [](){
-            lamerMarkTestAsTodo("Implement exception");
-            // lamer if bloops cause fizzbuzzer to fail
-            lamerAbortTest(LAMER_SKIP_TEST, "Exception not implemented yet");
+            dummyMarkTestAsTodo("Implement exception");
+            // dummy if bloops cause fizzbuzzer to fail
+            dummyAbortTest(DUMMY_SKIP_TEST, "Exception not implemented yet");
         });
 
     Describe("bloop")
         .it("can make a sound", [](){
             // emulate a sound
-            lamerAbortTest(LAMER_FAIL_TEST, "Bloop is silent!");
+            dummyAbortTest(DUMMY_FAIL_TEST, "Bloop is silent!");
         })
         .it("looks weird", [](){
-            lamerMarkTestAsTodo("Bloop needs to look weirder.");
+            dummyMarkTestAsTodo("Bloop needs to look weirder.");
             // bloops should always look weird
-            lamerAbortTest(LAMER_FAIL_TEST, "Bloop doesn't looks weird enough!");
+            dummyAbortTest(DUMMY_FAIL_TEST, "Bloop doesn't looks weird enough!");
         });
 
-    lamerRunTests();
+    dummyRunTests();
 }

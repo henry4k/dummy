@@ -1,5 +1,5 @@
-#ifndef __LAMER_TAP_REPORTER_H__
-#define __LAMER_TAP_REPORTER_H__
+#ifndef __DUMMY_TAP_REPORTER_H__
+#define __DUMMY_TAP_REPORTER_H__
 
 #include "core.h"
 
@@ -9,9 +9,9 @@ extern "C"
 #endif
 
 /**
- * Reports using the 'lamer anything protocol' (TAP).
+ * Reports using the 'dummy anything protocol' (TAP).
  */
-const lamerReporter* lamerGetTAPReporter();
+const dummyReporter* dummyGetTAPReporter();
 
 #ifdef __cplusplus
 }

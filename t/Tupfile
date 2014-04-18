@@ -3,6 +3,6 @@ include_rules
 : foreach *.c |> !cc |> %B.o {c-objects}
 : foreach *.cpp |> !cxx |> %B.o {cpp-objects}
 
-LDFLAGS += ../lamer/lamer.a
-: foreach {c-objects} | ../lamer/lamer.a |> !ldcc |> %B
-: foreach {cpp-objects} | ../lamer/lamer.a |> !ldcxx |> %B
+LDFLAGS += ../dummy/dummy.a
+: foreach {c-objects} | ../dummy/dummy.a |> !ldcc |> %B
+: foreach {cpp-objects} | ../dummy/dummy.a |> !ldcxx |> %B

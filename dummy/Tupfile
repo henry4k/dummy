@@ -2,4 +2,4 @@ include_rules
 
 : foreach *.c |> !cc |> %B.o
 
-: *.o |> !ar |> lamer.a
+: *.o |> !ar |> dummy.a
