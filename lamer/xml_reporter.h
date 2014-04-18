@@ -1,5 +1,5 @@
-#ifndef __TEST_XML_REPORTER_H__
-#define __TEST_XML_REPORTER_H__
+#ifndef __LAMER_XML_REPORTER_H__
+#define __LAMER_XML_REPORTER_H__
 
 #include "core.h"
 
@@ -11,7 +11,7 @@ extern "C"
 /**
  * Reports in a JUnit compatible XML format.
  */
-const testReporter* testGetXMLReporter();
+const lamerReporter* lamerGetXMLReporter();
 
 #ifdef __cplusplus
 }

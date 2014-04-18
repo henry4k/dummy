@@ -10,59 +10,59 @@ typedef struct
 static void began( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
-    fprintf(ctx->file, "1..%d\n", testGetCaseCount());
+    fprintf(ctx->file, "1..%d\n", lamerGetTestCount());
 }
 
 static void completed( void* ctx_ )
 {
 }
 
-static void beganCase( void* ctx_ )
+static void beganTest( void* ctx_ )
 {
 }
 
-static const char* testCaseResultToTAPString( testCaseResult result )
+static const char* lamerTestResultToTAPString( lamerTestResult result )
 {
     switch(result)
     {
-        case TEST_CASE_PASSED:
+        case LAMER_TEST_PASSED:
             return "ok";
-        case TEST_CASE_FAILED:
+        case LAMER_TEST_FAILED:
             return "not ok";
-        case TEST_CASE_SKIPPED:
+        case LAMER_TEST_SKIPPED:
             return "ok";
         default:
             assert(!"Unknown result");
     }
 }
 
-static void completedCase( void* ctx_ )
+static void completedTest( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
 
-    testCaseResult result = testGetCaseResult();
-    const char* resultString = testCaseResultToTAPString(result);
-    const char* abortReason = testGetCaseAbortReason();
+    lamerTestResult result = lamerGetTestResult();
+    const char* resultString = lamerTestResultToTAPString(result);
+    const char* abortReason = lamerGetTestAbortReason();
 
-    if(result == TEST_CASE_FAILED && abortReason)
+    if(result == LAMER_TEST_FAILED && abortReason)
     {
         fprintf(ctx->file, "# %s\n", abortReason);
     }
 
     fprintf(ctx->file, "%s %d %s",
         resultString,
-        testGetCaseNumber()+1,
-        testGetCaseName()
+        lamerGetTestNumber()+1,
+        lamerGetTestName()
     );
 
-    if(testCaseIsMarkedAsTodo())
+    if(lamerTestIsMarkedAsTodo())
     {
         fprintf(ctx->file, " # TODO");
-        const char* todoReason = testGetCaseTodoReason();
+        const char* todoReason = lamerGetTestTodoReason();
         if(todoReason)
             fprintf(ctx->file, " %s", todoReason);
     }
-    else if(result == TEST_CASE_SKIPPED)
+    else if(result == LAMER_TEST_SKIPPED)
     {
         fprintf(ctx->file, " # SKIP");
         if(abortReason)
@@ -78,18 +78,18 @@ static void diag( void* ctx_, const char* message )
     fprintf(ctx->file, "# %s\n", message);
 }
 
-const testReporter* testGetTAPReporter()
+const lamerReporter* lamerGetTAPReporter()
 {
     static Context ctx;
-    static testReporter reporter;
+    static lamerReporter reporter;
 
     ctx.file = stdout;
 
     reporter.context = &ctx;
     reporter.began = began;
     reporter.completed = completed;
-    reporter.beganCase = beganCase;
-    reporter.completedCase = completedCase;
+    reporter.beganTest = beganTest;
+    reporter.completedTest = completedTest;
     reporter.diag = diag;
 
     return &reporter;

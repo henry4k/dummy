@@ -1,17 +1,17 @@
-#ifndef __TEST_BDD_HPP__
-#define __TEST_BDD_HPP__
+#ifndef __LAMER_BDD_HPP__
+#define __LAMER_BDD_HPP__
 
 #include <string>
 #include "core.h"
 
-namespace test
+namespace lamer
 {
 
 class Describe
 {
 public:
     Describe( const char* subject );
-    Describe& it( const char* behaviour, testCaseFunction fn );
+    Describe& it( const char* behaviour, lamerTestFunction fn );
 
 private:
     std::string m_Subject;
@@ -25,9 +25,9 @@ Describe::Describe( const char* subject ) :
 {
 }
 
-Describe& Describe::it( const char* behaviour, testCaseFunction fn )
+Describe& Describe::it( const char* behaviour, lamerTestFunction fn )
 {
-    testAddCase((m_Subject+" "+behaviour).c_str(), fn);
+    lamerAddTest((m_Subject+" "+behaviour).c_str(), fn);
     return *this;
 }
 

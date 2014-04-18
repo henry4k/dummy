@@ -1,5 +1,5 @@
-libtest
-=======
+lamer
+=====
 
 A flexible test framework for C.
 

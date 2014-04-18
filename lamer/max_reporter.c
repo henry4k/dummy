@@ -10,8 +10,8 @@ typedef struct
 static void began( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
-    fprintf(ctx->file, "test case count = %d\n",
-        testGetCaseCount()
+    fprintf(ctx->file, "test count = %d\n",
+        lamerGetTestCount()
     );
 }
 
@@ -21,54 +21,54 @@ static void completed( void* ctx_ )
     fprintf(ctx->file, "testing done\n");
 }
 
-static void beganCase( void* ctx_ )
+static void beganTest( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
-    fprintf(ctx->file, "test case number = %d\n",
-        testGetCaseNumber()
+    fprintf(ctx->file, "test number = %d\n",
+        lamerGetTestNumber()
     );
-    fprintf(ctx->file, "test case name = '%s'\n",
-        testGetCaseName()
+    fprintf(ctx->file, "test name = '%s'\n",
+        lamerGetTestName()
     );
 }
 
-static void completedCase( void* ctx_ )
+static void completedTest( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
 
     const char* result = NULL;
-    switch(testGetCaseResult())
+    switch(lamerGetTestResult())
     {
-        case TEST_CASE_PASSED:
+        case LAMER_TEST_PASSED:
             result = "passed";
             break;
 
-        case TEST_CASE_FAILED:
+        case LAMER_TEST_FAILED:
             result = "failed";
             break;
 
-        case TEST_CASE_SKIPPED:
+        case LAMER_TEST_SKIPPED:
             result = "skipped";
             break;
 
         default:
             assert(!"Unknown result");
     }
-    fprintf(ctx->file, "test case result = '%s'\n",
+    fprintf(ctx->file, "test result = '%s'\n",
         result
     );
-    fprintf(ctx->file, "test case abort reason = '%s'\n",
-        testGetCaseAbortReason()
+    fprintf(ctx->file, "test abort reason = '%s'\n",
+        lamerGetTestAbortReason()
     );
 
-    fprintf(ctx->file, "test case todo = %d\n",
-        testCaseIsMarkedAsTodo()
+    fprintf(ctx->file, "test todo = %d\n",
+        lamerTestIsMarkedAsTodo()
     );
-    fprintf(ctx->file, "test case todo reason = '%s'\n",
-        testGetCaseTodoReason()
+    fprintf(ctx->file, "test todo reason = '%s'\n",
+        lamerGetTestTodoReason()
     );
 
-    fprintf(ctx->file, "test case done\n");
+    fprintf(ctx->file, "test done\n");
 }
 
 static void diag( void* ctx_, const char* message )
@@ -79,18 +79,18 @@ static void diag( void* ctx_, const char* message )
     );
 }
 
-const testReporter* testGetMaxReporter()
+const lamerReporter* lamerGetMaxReporter()
 {
     static Context ctx;
-    static testReporter reporter;
+    static lamerReporter reporter;
 
     ctx.file = stdout;
 
     reporter.context = &ctx;
     reporter.began = began;
     reporter.completed = completed;
-    reporter.beganCase = beganCase;
-    reporter.completedCase = completedCase;
+    reporter.beganTest = beganTest;
+    reporter.completedTest = completedTest;
     reporter.diag = diag;
 
     return &reporter;

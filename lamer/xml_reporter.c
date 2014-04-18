@@ -12,8 +12,8 @@ typedef struct
 static void began( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
-    fprintf(ctx->file, "<testsuite tests=\"%d\">%s",
-        testGetCaseCount(),
+    fprintf(ctx->file, "<lamersuite lamers=\"%d\">%s",
+        lamerGetTestCount(),
         ctx->newline
     );
 }
@@ -21,34 +21,34 @@ static void began( void* ctx_ )
 static void completed( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
-    fprintf(ctx->file, "</testsuite>%s",
+    fprintf(ctx->file, "</lamersuite>%s",
         ctx->newline
     );
 }
 
-static void beganCase( void* ctx_ )
+static void beganTest( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
-    fprintf(ctx->file, "%s<testcase name=\"%s\">%s",
+    fprintf(ctx->file, "%s<lamertest name=\"%s\">%s",
         ctx->tab,
-        testGetCaseName(),
+        lamerGetTestName(),
         ctx->newline
     );
 }
 
-static void completedCase( void* ctx_ )
+static void completedTest( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
 
-    const char* abortReason = testGetCaseAbortReason();
+    const char* abortReason = lamerGetTestAbortReason();
 
-    testCaseResult result = testGetCaseResult();
+    lamerTestResult result = lamerGetTestResult();
     switch(result)
     {
-        case TEST_CASE_PASSED:
+        case LAMER_TEST_PASSED:
             break;
 
-        case TEST_CASE_FAILED:
+        case LAMER_TEST_FAILED:
             if(abortReason)
             {
                 fprintf(ctx->file, "%s%s<failure>%s</failure>%s",
@@ -68,7 +68,7 @@ static void completedCase( void* ctx_ )
             }
             break;
 
-        case TEST_CASE_SKIPPED:
+        case LAMER_TEST_SKIPPED:
             if(abortReason)
             {
                 fprintf(ctx->file, "%s%s<skipped>%s</failure>%s",
@@ -92,7 +92,7 @@ static void completedCase( void* ctx_ )
             assert(!"Unknown result");
     }
 
-    fprintf(ctx->file, "%s</testcase>%s",
+    fprintf(ctx->file, "%s</lamertest>%s",
         ctx->tab,
         ctx->newline
     );
@@ -109,10 +109,10 @@ static void diag( void* ctx_, const char* message )
     );
 }
 
-const testReporter* testGetXMLReporter()
+const lamerReporter* lamerGetXMLReporter()
 {
     static Context ctx;
-    static testReporter reporter;
+    static lamerReporter reporter;
 
     ctx.file = stdout;
     ctx.tab = "    ";
@@ -121,8 +121,8 @@ const testReporter* testGetXMLReporter()
     reporter.context = &ctx;
     reporter.began = began;
     reporter.completed = completed;
-    reporter.beganCase = beganCase;
-    reporter.completedCase = completedCase;
+    reporter.beganTest = beganTest;
+    reporter.completedTest = completedTest;
     reporter.diag = diag;
 
     return &reporter;

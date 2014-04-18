@@ -1,72 +1,72 @@
-test case count = 10
-test case number = 0
-test case name = 'PassingTest'
-test case result = 'passed'
-test case abort reason = '(null)'
-test case todo = 0
-test case todo reason = '(null)'
-test case done
-test case number = 1
-test case name = 'AssertTest'
-test case result = 'failed'
-test case abort reason = '(null)'
-test case todo = 0
-test case todo reason = '(null)'
-test case done
-test case number = 2
-test case name = 'FailTest'
-test case result = 'failed'
-test case abort reason = '(null)'
-test case todo = 0
-test case todo reason = '(null)'
-test case done
-test case number = 3
-test case name = 'FailWithReasonTest'
-test case result = 'failed'
-test case abort reason = 'Failed with a reason'
-test case todo = 0
-test case todo reason = '(null)'
-test case done
-test case number = 4
-test case name = 'PassingRequireTest'
-test case result = 'passed'
-test case abort reason = '(null)'
-test case todo = 0
-test case todo reason = '(null)'
-test case done
-test case number = 5
-test case name = 'FailingRequireTest'
-test case result = 'failed'
-test case abort reason = '2+2 == 5 failed'
-test case todo = 0
-test case todo reason = '(null)'
-test case done
-test case number = 6
-test case name = 'SkipTest'
-test case result = 'skipped'
-test case abort reason = '(null)'
-test case todo = 0
-test case todo reason = '(null)'
-test case done
-test case number = 7
-test case name = 'SkipWithReasonTest'
-test case result = 'skipped'
-test case abort reason = 'Skipped with a reason'
-test case todo = 0
-test case todo reason = '(null)'
-test case done
-test case number = 8
-test case name = 'TodoTest'
-test case result = 'passed'
-test case abort reason = '(null)'
-test case todo = 1
-test case todo reason = '(null)'
-test case done
-test case number = 9
-test case name = 'TodoWithReasonTest'
-test case result = 'passed'
-test case abort reason = '(null)'
-test case todo = 1
-test case todo reason = 'TODO with a reason'
-test case done
+test count = 10
+test number = 0
+test name = 'PassingTest'
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 1
+test name = 'AssertTest'
+test result = 'failed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 2
+test name = 'FailTest'
+test result = 'failed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 3
+test name = 'FailWithReasonTest'
+test result = 'failed'
+test abort reason = 'Failed with a reason'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 4
+test name = 'PassingRequireTest'
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 5
+test name = 'FailingRequireTest'
+test result = 'failed'
+test abort reason = '2+2 == 5 failed'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 6
+test name = 'SkipTest'
+test result = 'skipped'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 7
+test name = 'SkipWithReasonTest'
+test result = 'skipped'
+test abort reason = 'Skipped with a reason'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 8
+test name = 'TodoTest'
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 1
+test todo reason = '(null)'
+test done
+test number = 9
+test name = 'TodoWithReasonTest'
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 1
+test todo reason = 'TODO with a reason'
+test done
 testing done
