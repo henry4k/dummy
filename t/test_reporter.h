@@ -1,7 +1,7 @@
-#ifndef __DUMMY_MAX_REPORTER_H__
-#define __DUMMY_MAX_REPORTER_H__
+#ifndef __DUMMY_TEST_REPORTER_H__
+#define __DUMMY_TEST_REPORTER_H__
 
-#include "core.h"
+#include "../dummy/core.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -15,7 +15,7 @@ extern "C"
  * It is used for self dummying and not intended to be used externally,
  * since the format may change over time.
  */
-const dummyReporter* dummyGetMaxReporter();
+const dummyReporter* dummyGetTestReporter();
 
 #ifdef __cplusplus
 }

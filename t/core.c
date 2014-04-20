@@ -1,10 +1,13 @@
 #include <stdlib.h> // malloc, free
 #include <stddef.h> // NULL
 #include <assert.h>
+
 #include "../dummy/core.h"
 #include "../dummy/protected_call.h"
 #include "../dummy/require.h"
-#include "../dummy/max_reporter.h"
+
+#include "test_reporter.h"
+
 
 void PassingTest()
 {
@@ -85,7 +88,7 @@ void FailingCleanupTest()
 
 int main()
 {
-    dummyInit(dummyGetMaxReporter());
+    dummyInit(dummyGetTestReporter());
     dummyAddTest("PassingTest", PassingTest);
     dummyAddTest("AssertTest", AssertTest);
     dummyAddTest("FailTest", FailTest);

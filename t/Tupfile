@@ -1,8 +1,10 @@
 include_rules
 
-: foreach *.c |> !cc |> %B.o {c-objects}
-: foreach *.cpp |> !cxx |> %B.o {cpp-objects}
+: foreach *.c |> !cc |> %B.o
+: foreach *.cpp |> !cxx |> %B.o
 
 LDFLAGS += ../dummy/dummy.a
-: foreach {c-objects} | ../dummy/dummy.a |> !ldcc |> %B
-: foreach {cpp-objects} | ../dummy/dummy.a |> !ldcxx |> %B
+
+: protected_call.o | ../dummy/dummy.a |> !ldcc |> protected_call
+: test_reporter.o core.o | ../dummy/dummy.a |> !ldcc |> core
+: test_reporter.o bdd.o | ../dummy/dummy.a |> !ldcxx |> bdd

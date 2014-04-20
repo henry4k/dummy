@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
-#include "max_reporter.h"
+#include "test_reporter.h"
 
 typedef struct
 {
@@ -79,7 +79,7 @@ static void log( void* ctx_, const char* message )
     );
 }
 
-const dummyReporter* dummyGetMaxReporter()
+const dummyReporter* dummyGetTestReporter()
 {
     static Context ctx;
     static dummyReporter reporter;
