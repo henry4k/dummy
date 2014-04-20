@@ -12,21 +12,10 @@
 enum
 {
     DUMMY_MAX_MESSAGE_LENGTH = 127,
-    DUMMY_MAX_CLEANUPS = 32,
     DUMMY_MAX_TESTS = 32,
     DUMMY_INVALID_TEST_INDEX = -1,
     DUMMY_PROTECTED_CALL_SKIPPED = -1
 };
-
-/**
- * Is called after the test has been completed -
- * regardless of whether it failed or succeeded.
- */
-typedef struct
-{
-    dummyCleanupFunction fn;
-    void* data;
-} dummyCleanup;
 
 typedef struct
 {
@@ -39,9 +28,6 @@ typedef struct
 
     bool markedAsTodo;
     char todoReason[DUMMY_MAX_MESSAGE_LENGTH];
-
-    dummyCleanup cleanupStack[DUMMY_MAX_CLEANUPS];
-    int cleanupStackSize;
 } dummyTest;
 
 typedef struct
@@ -123,36 +109,6 @@ int dummyAddTest( const char* name, dummyTestFunction fn )
     return ctx->testCount-1;
 }
 
-void dummyAddCleanup( dummyCleanupFunction fn, void* data )
-{
-    dummyTest* test = dummyGetCurrentTest();
-    assert(test->cleanupStackSize < DUMMY_MAX_CLEANUPS);
-    dummyCleanup* cleanup = &test->cleanupStack[test->cleanupStackSize];
-
-    cleanup->fn = fn;
-    cleanup->data = data;
-
-    test->cleanupStackSize++;
-}
-
-void dummyRunTestCallback()
-{
-    dummyTest* test = dummyGetCurrentTest();
-
-    const char* abortReason = NULL;
-    const int errorCode = dummyProtectedCall(test->fn, &abortReason);
-
-    for(int i = 0; i < test->cleanupStackSize; i++)
-    {
-        dummyCleanup* cleanup = &test->cleanupStack[i];
-        cleanup->fn(cleanup->data);
-    }
-    test->cleanupStackSize = 0;
-
-    if(errorCode != DUMMY_PROTECTED_CALL_SUCEEDED)
-        dummyAbortProtectedCall(errorCode, abortReason);
-}
-
 bool dummyRunTest( int index )
 {
     dummyContext* ctx = dummyCurrentContext;
@@ -172,7 +128,7 @@ bool dummyRunTest( int index )
     // run
     test->status = DUMMY_TEST_RUNNING;
     const char* abortReason = NULL;
-    const int errorCode = dummyProtectedCall(dummyRunTestCallback, &abortReason);
+    const int errorCode = dummyProtectedCall(test->fn, &abortReason);
     switch(errorCode)
     {
         case DUMMY_PROTECTED_CALL_SUCEEDED:

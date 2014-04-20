@@ -2,6 +2,7 @@
 #include <stddef.h> // NULL
 #include <assert.h>
 #include "../dummy/core.h"
+#include "../dummy/protected_call.h"
 #include "../dummy/require.h"
 #include "../dummy/max_reporter.h"
 

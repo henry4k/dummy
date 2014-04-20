@@ -11,14 +11,29 @@
 enum
 {
     DUMMY_MAX_ENVIRONMENTS = 16,
+    DUMMY_MAX_CLEANUPS = 32,
     DUMMY_MAX_PROTECTED_CALL_REASON_LENGTH = 512
 };
+
+/**
+ * Is called after the test has been completed -
+ * regardless of whether it failed or succeeded.
+ */
+typedef struct
+{
+    dummyCleanupFunction fn;
+    void* data;
+} dummyCleanup;
 
 typedef struct
 {
     jmp_buf jumpBuffer;
+
     int errorCode;
     char abortReason[DUMMY_MAX_PROTECTED_CALL_REASON_LENGTH];
+
+    dummyCleanup cleanupStack[DUMMY_MAX_CLEANUPS];
+    int cleanupStackSize;
 } dummyEnvironment;
 
 typedef void (*dummySignalFunction)(int);
@@ -117,6 +132,7 @@ void dummySignalHandler( int signal )
 
 int dummyProtectedCall( dummyProtectableFunction fn, const char** abortReason )
 {
+    // run function
     dummyEnvironment* environment = dummyPushEnvironment();
     const int jumpResult = setjmp(environment->jumpBuffer);
     if(jumpResult == 0)
@@ -130,6 +146,15 @@ int dummyProtectedCall( dummyProtectableFunction fn, const char** abortReason )
     }
     dummyPopEnvironment();
 
+    // cleanup
+    for(int i = 0; i < environment->cleanupStackSize; i++)
+    {
+        dummyCleanup* cleanup = &environment->cleanupStack[i];
+        cleanup->fn(cleanup->data);
+    }
+    environment->cleanupStackSize = 0;
+
+    // return results
     if(abortReason)
     {
         if(environment->abortReason[0] == '\0')
@@ -138,6 +163,20 @@ int dummyProtectedCall( dummyProtectableFunction fn, const char** abortReason )
             *abortReason = environment->abortReason;
     }
     return environment->errorCode;
+}
+
+void dummyAddCleanup( dummyCleanupFunction fn, void* data )
+{
+    dummyEnvironment* environment = dummyGetCurrentEnvironment();
+    assert(environment);
+
+    assert(environment->cleanupStackSize < DUMMY_MAX_CLEANUPS);
+    dummyCleanup* cleanup = &environment->cleanupStack[environment->cleanupStackSize];
+
+    cleanup->fn = fn;
+    cleanup->data = data;
+
+    environment->cleanupStackSize++;
 }
 
 void dummySetAbortInformation( int errorCode, const char* reason )

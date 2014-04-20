@@ -8,6 +8,8 @@ extern "C"
 
 typedef void (*dummyProtectableFunction)();
 
+typedef void (*dummyCleanupFunction)( void* data );
+
 enum
 {
     DUMMY_PROTECTED_CALL_SUCEEDED = 0,
@@ -29,6 +31,14 @@ enum
  * Custom error codes may be passed using dummyAbortProtectedCall().
  */
 int dummyProtectedCall( dummyProtectableFunction fn, const char** abortReason );
+
+/**
+ * Adds a cleanup function to the current protected call.
+ *
+ * @param data
+ * Data pointer that is passed to the cleanup function.
+ */
+void dummyAddCleanup( dummyCleanupFunction fn, void* data );
 
 /**
  * Aborts the current protected call.

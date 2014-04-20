@@ -52,8 +52,6 @@ typedef struct
     void (*log)( void* context, const char* message );
 } dummyReporter;
 
-typedef void (*dummyCleanupFunction)( void* data );
-
 /**
  * Function that is called for a test.
  */
@@ -93,15 +91,6 @@ int dummyRunTests();
  * Id of the test.
  */
 int dummyAddTest( const char* name, dummyTestFunction fn );
-
-/**
- * Adds a cleanup function to the current test.
- * The function is called regardless whether the test succeeds or fails.
- *
- * @param data
- * Data pointer that is passed to the cleanup function.
- */
-void dummyAddCleanup( dummyCleanupFunction fn, void* data );
 
 /**
  * Status of the current context.
