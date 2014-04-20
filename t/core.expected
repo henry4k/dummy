@@ -9,7 +9,7 @@ test done
 test number = 1
 test name = 'AssertTest'
 test result = 'failed'
-test abort reason = '(null)'
+test abort reason = 'SIGABRT: Abnormal termination'
 test todo = 0
 test todo reason = '(null)'
 test done

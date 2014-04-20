@@ -2,10 +2,10 @@
 #include <string.h> // memset, strncpy
 #include <stdio.h>  // dummyFormat etc
 #include <stdarg.h> // dummyFormat etc
-#include <signal.h>
-#include <setjmp.h>
 #include <stdbool.h>
 #include <assert.h>
+
+#include "protected_call.h"
 #include "core.h"
 
 
@@ -14,8 +14,8 @@ enum
     DUMMY_MAX_MESSAGE_LENGTH = 127,
     DUMMY_MAX_CLEANUPS = 32,
     DUMMY_MAX_TESTS = 32,
-    DUMMY_MAX_ENVIRONMENTS = 16,
-    DUMMY_INVALID_TEST_INDEX = -1
+    DUMMY_INVALID_TEST_INDEX = -1,
+    DUMMY_PROTECTED_CALL_SKIPPED = -1
 };
 
 /**
@@ -46,11 +46,6 @@ typedef struct
 
 typedef struct
 {
-    jmp_buf jumpBuffer;
-} dummyEnvironment;
-
-typedef struct
-{
     const dummyReporter* reporter;
     dummyStatus status;
 
@@ -58,20 +53,13 @@ typedef struct
     int testCount;
 
     int currentTestIndex;
-
-    dummyEnvironment environmentStack[DUMMY_MAX_ENVIRONMENTS];
-    int environmentStackSize;
 } dummyContext;
-
-typedef void (*dummyProtectableFunction)();
 
 
 dummyContext* dummyCurrentContext = NULL;
 
 
 bool dummyRunTest( int index );
-bool dummyProtectedCall( dummyTestFunction fn );
-void dummySignalHandler( int signal );
 dummyTest* dummyGetCurrentTest();
 
 void dummyInit( const dummyReporter* reporter )
@@ -176,28 +164,35 @@ bool dummyRunTest( int index )
     test->status = DUMMY_TEST_STARTING;
     test->result = DUMMY_TEST_PASSED;
     ctx->reporter->beganTest(ctx->reporter->context);
-    signal(SIGABRT, dummySignalHandler);
-    signal(SIGFPE, dummySignalHandler);
-    signal(SIGILL, dummySignalHandler);
-    signal(SIGSEGV, dummySignalHandler);
 
     // run
     test->status = DUMMY_TEST_RUNNING;
-    const bool passed = dummyProtectedCall(dummyRunTestCallback);
-    if(!passed && test->result == DUMMY_TEST_PASSED)
-        test->result = DUMMY_TEST_FAILED;
+    const char* abortReason = NULL;
+    const int errorCode = dummyProtectedCall(dummyRunTestCallback, &abortReason);
+    switch(errorCode)
+    {
+        case DUMMY_PROTECTED_CALL_SUCEEDED:
+            test->result = DUMMY_TEST_PASSED;
+            break;
+
+        case DUMMY_PROTECTED_CALL_SKIPPED:
+            test->result = DUMMY_TEST_SKIPPED;
+            break;
+
+        case DUMMY_PROTECTED_CALL_GENERIC_ERROR:
+        default:
+            test->result = DUMMY_TEST_FAILED;
+    }
+    if(abortReason)
+        strncpy(test->abortReason, abortReason, DUMMY_MAX_MESSAGE_LENGTH);
     test->status = DUMMY_TEST_COMPLETED;
 
     // cleanup
-    signal(SIGABRT, SIG_DFL);
-    signal(SIGFPE, SIG_DFL);
-    signal(SIGILL, SIG_DFL);
-    signal(SIGSEGV, SIG_DFL);
     ctx->reporter->completedTest(ctx->reporter->context);
     ctx->currentTestIndex = DUMMY_INVALID_TEST_INDEX;
     test->status = DUMMY_TEST_UNDEFINED;
 
-    return passed;
+    return test->result != DUMMY_TEST_FAILED;
 }
 
 dummyStatus dummyGetStatus()
@@ -304,28 +299,31 @@ const char* dummyFormatV( const char* format, va_list args )
 
 void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
 {
-    dummyTest* test = dummyGetCurrentTest();
+    int errorCode = DUMMY_PROTECTED_CALL_GENERIC_ERROR;
     switch(type)
     {
         case DUMMY_FAIL_TEST:
-            test->result = DUMMY_TEST_FAILED;
+            errorCode = DUMMY_PROTECTED_CALL_GENERIC_ERROR;
             break;
 
         case DUMMY_SKIP_TEST:
-            test->result = DUMMY_TEST_SKIPPED;
+            errorCode = DUMMY_PROTECTED_CALL_SKIPPED;
             break;
 
         default:
             assert(!"Unknown abort type");
     }
+
+    const char* formattedReason = NULL;
     if(reason)
     {
         va_list args;
         va_start(args, reason);
-        strncpy(test->abortReason, dummyFormatV(reason, args), DUMMY_MAX_MESSAGE_LENGTH);
+        formattedReason = dummyFormatV(reason, args);
         va_end(args);
     }
-    abort();
+
+    dummyAbortProtectedCall(errorCode, formattedReason);
 }
 
 void dummyMarkTestAsTodo( const char* reason, ... )
@@ -352,59 +350,4 @@ void dummyLog( const char* message, ... )
     va_end(args);
 
     ctx->reporter->log(ctx->reporter->context, formattedMessage);
-}
-
-
-// ----- protected call -----
-
-dummyEnvironment* dummyGetCurrentEnvironment()
-{
-    dummyContext* ctx = dummyCurrentContext;
-    assert(ctx);
-
-    if(ctx->environmentStackSize > 0)
-        return &ctx->environmentStack[ctx->environmentStackSize-1];
-    else
-        return NULL;
-}
-
-dummyEnvironment* dummyPushEnvironment()
-{
-    dummyContext* ctx = dummyCurrentContext;
-    assert(ctx);
-
-    ctx->environmentStackSize++;
-    assert(ctx->environmentStackSize <= DUMMY_MAX_ENVIRONMENTS);
-
-    dummyEnvironment* environment = dummyGetCurrentEnvironment();
-    memset(environment, 0, sizeof(dummyEnvironment));
-    return environment;
-}
-
-dummyEnvironment* dummyPopEnvironment()
-{
-    dummyContext* ctx = dummyCurrentContext;
-    assert(ctx);
-
-    assert(ctx->environmentStackSize > 0);
-    dummyEnvironment* environment = dummyGetCurrentEnvironment();
-    ctx->environmentStackSize--;
-    return environment;
-}
-
-void dummySignalHandler( int signal )
-{
-    dummyEnvironment* environment = dummyGetCurrentEnvironment();
-    if(environment)
-        longjmp(environment->jumpBuffer, 1);
-}
-
-bool dummyProtectedCall( dummyProtectableFunction fn )
-{
-    dummyEnvironment* environment = dummyPushEnvironment();
-    const int jumpResult = setjmp(environment->jumpBuffer);
-    if(jumpResult == 0)
-        fn();
-    dummyPopEnvironment();
-    return jumpResult == 0;
 }
