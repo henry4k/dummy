@@ -120,7 +120,14 @@ int dummyProtectedCall( dummyProtectableFunction fn, const char** abortReason )
     dummyEnvironment* environment = dummyPushEnvironment();
     const int jumpResult = setjmp(environment->jumpBuffer);
     if(jumpResult == 0)
+    {
         fn();
+    }
+    else
+    {
+        // A signal has been catched: reset signals
+        dummySetSignals(dummySignalHandler);
+    }
     dummyPopEnvironment();
 
     if(abortReason)

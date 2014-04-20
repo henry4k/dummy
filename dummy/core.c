@@ -139,7 +139,8 @@ void dummyRunTestCallback()
 {
     dummyTest* test = dummyGetCurrentTest();
 
-    test->fn();
+    const char* abortReason = NULL;
+    const int errorCode = dummyProtectedCall(test->fn, &abortReason);
 
     for(int i = 0; i < test->cleanupStackSize; i++)
     {
@@ -147,6 +148,9 @@ void dummyRunTestCallback()
         cleanup->fn(cleanup->data);
     }
     test->cleanupStackSize = 0;
+
+    if(errorCode != DUMMY_PROTECTED_CALL_SUCEEDED)
+        dummyAbortProtectedCall(errorCode, abortReason);
 }
 
 bool dummyRunTest( int index )

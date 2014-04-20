@@ -71,12 +71,14 @@ void CleanupInt( void* value_ )
 
 void PassingCleanupTest()
 {
-    CleanupInt(CreateInt(42));
+    void* data = CreateInt(42);
+    dummyAddCleanup(CleanupInt, data);
 }
 
 void FailingCleanupTest()
 {
-    CleanupInt(CreateInt(42));
+    void* data = CreateInt(42);
+    dummyAddCleanup(CleanupInt, data);
     dummyAbortTest(DUMMY_FAIL_TEST, NULL);
 }
 
