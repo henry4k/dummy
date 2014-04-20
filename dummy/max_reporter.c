@@ -71,7 +71,7 @@ static void completedTest( void* ctx_ )
     fprintf(ctx->file, "test done\n");
 }
 
-static void diag( void* ctx_, const char* message )
+static void log( void* ctx_, const char* message )
 {
     const Context* ctx = (Context*)ctx_;
     fprintf(ctx->file, "%s\n",
@@ -91,7 +91,7 @@ const dummyReporter* dummyGetMaxReporter()
     reporter.completed = completed;
     reporter.beganTest = beganTest;
     reporter.completedTest = completedTest;
-    reporter.diag = diag;
+    reporter.log = log;
 
     return &reporter;
 }

@@ -49,8 +49,15 @@ typedef struct
     void (*beganTest)( void* context );
     void (*completedTest)( void* context );
 
-    void (*diag)( void* context, const char* message );
+    void (*log)( void* context, const char* message );
 } dummyReporter;
+
+typedef void (*dummyCleanupFunction)( void* data );
+
+/**
+ * Function that is called for a test.
+ */
+typedef void (*dummyTestFunction)();
 
 
 /**
@@ -73,11 +80,6 @@ void dummyInit( const dummyReporter* reporter );
 int dummyRunTests();
 
 /**
- * Function that is called for a test.
- */
-typedef void (*dummyTestFunction)();
-
-/**
  * Adds a test to the current context.
  *
  * @param name
@@ -91,6 +93,15 @@ typedef void (*dummyTestFunction)();
  * Id of the test.
  */
 int dummyAddTest( const char* name, dummyTestFunction fn );
+
+/**
+ * Adds a cleanup function to the current test.
+ * The function is called regardless whether the test succeeds or fails.
+ *
+ * @param data
+ * Data pointer that is passed to the cleanup function.
+ */
+void dummyAddCleanup( dummyCleanupFunction fn, void* data );
 
 /**
  * Status of the current context.
@@ -157,6 +168,12 @@ void dummyAbortTest( dummyTestAbortType type, const char* reason, ... );
  * may overwrite the previous TODO reason.
  */
 void dummyMarkTestAsTodo( const char* reason, ... );
+
+
+/**
+ * Reports a diagnostic message.
+ */
+void dummyLog( const char* message, ... );
 
 
 #ifdef __cplusplus

@@ -1,4 +1,4 @@
-test count = 10
+test count = 12
 test number = 0
 test name = 'PassingTest'
 test result = 'passed'
@@ -68,5 +68,23 @@ test result = 'passed'
 test abort reason = '(null)'
 test todo = 1
 test todo reason = 'TODO with a reason'
+test done
+test number = 10
+test name = 'PassingCleanupTest'
+created 42
+cleaned 42
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 11
+test name = 'FailingCleanupTest'
+created 42
+cleaned 42
+test result = 'failed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
 test done
 testing done

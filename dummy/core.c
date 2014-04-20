@@ -18,9 +18,6 @@ enum
     DUMMY_INVALID_TEST_INDEX = -1
 };
 
-
-typedef void (*dummyCleanupFunction)( void* data );
-
 /**
  * Is called after the test has been completed -
  * regardless of whether it failed or succeeded.
@@ -66,6 +63,8 @@ typedef struct
     int environmentStackSize;
 } dummyContext;
 
+typedef void (*dummyProtectableFunction)();
+
 
 dummyContext* dummyCurrentContext = NULL;
 
@@ -73,6 +72,7 @@ dummyContext* dummyCurrentContext = NULL;
 bool dummyRunTest( int index );
 bool dummyProtectedCall( dummyTestFunction fn );
 void dummySignalHandler( int signal );
+dummyTest* dummyGetCurrentTest();
 
 void dummyInit( const dummyReporter* reporter )
 {
@@ -85,7 +85,7 @@ void dummyInit( const dummyReporter* reporter )
     assert(reporter->completed);
     assert(reporter->beganTest);
     assert(reporter->completedTest);
-    assert(reporter->diag);
+    assert(reporter->log);
     dummyCurrentContext->reporter = reporter;
 
     dummyCurrentContext->status = DUMMY_INITIALIZING;
@@ -124,15 +124,41 @@ int dummyAddTest( const char* name, dummyTestFunction fn )
     assert(ctx->status == DUMMY_INITIALIZING);
     assert(ctx->testCount < DUMMY_MAX_TESTS);
 
-    dummyTest* tc = &ctx->tests[ctx->testCount];
-    memset(tc, 0, sizeof(dummyTest));
+    dummyTest* test = &ctx->tests[ctx->testCount];
+    memset(test, 0, sizeof(dummyTest));
 
-    strncpy(tc->name, name, DUMMY_MAX_MESSAGE_LENGTH);
-    tc->fn = fn;
+    strncpy(test->name, name, DUMMY_MAX_MESSAGE_LENGTH);
+    test->fn = fn;
 
     ctx->testCount++;
 
     return ctx->testCount-1;
+}
+
+void dummyAddCleanup( dummyCleanupFunction fn, void* data )
+{
+    dummyTest* test = dummyGetCurrentTest();
+    assert(test->cleanupStackSize < DUMMY_MAX_CLEANUPS);
+    dummyCleanup* cleanup = &test->cleanupStack[test->cleanupStackSize];
+
+    cleanup->fn = fn;
+    cleanup->data = data;
+
+    test->cleanupStackSize++;
+}
+
+void dummyRunTestCallback()
+{
+    dummyTest* test = dummyGetCurrentTest();
+
+    test->fn();
+
+    for(int i = 0; i < test->cleanupStackSize; i++)
+    {
+        dummyCleanup* cleanup = &test->cleanupStack[i];
+        cleanup->fn(cleanup->data);
+    }
+    test->cleanupStackSize = 0;
 }
 
 bool dummyRunTest( int index )
@@ -143,12 +169,12 @@ bool dummyRunTest( int index )
 
     assert(index >= 0);
     assert(index < DUMMY_MAX_TESTS);
-    dummyTest* tc = &ctx->tests[index];
+    dummyTest* test = &ctx->tests[index];
 
     // prepare
     ctx->currentTestIndex = index;
-    tc->status = DUMMY_TEST_STARTING;
-    tc->result = DUMMY_TEST_PASSED;
+    test->status = DUMMY_TEST_STARTING;
+    test->result = DUMMY_TEST_PASSED;
     ctx->reporter->beganTest(ctx->reporter->context);
     signal(SIGABRT, dummySignalHandler);
     signal(SIGFPE, dummySignalHandler);
@@ -156,11 +182,11 @@ bool dummyRunTest( int index )
     signal(SIGSEGV, dummySignalHandler);
 
     // run
-    tc->status = DUMMY_TEST_RUNNING;
-    const bool passed = dummyProtectedCall(tc->fn);
-    if(!passed && tc->result == DUMMY_TEST_PASSED)
-        tc->result = DUMMY_TEST_FAILED;
-    tc->status = DUMMY_TEST_COMPLETED;
+    test->status = DUMMY_TEST_RUNNING;
+    const bool passed = dummyProtectedCall(dummyRunTestCallback);
+    if(!passed && test->result == DUMMY_TEST_PASSED)
+        test->result = DUMMY_TEST_FAILED;
+    test->status = DUMMY_TEST_COMPLETED;
 
     // cleanup
     signal(SIGABRT, SIG_DFL);
@@ -169,7 +195,7 @@ bool dummyRunTest( int index )
     signal(SIGSEGV, SIG_DFL);
     ctx->reporter->completedTest(ctx->reporter->context);
     ctx->currentTestIndex = DUMMY_INVALID_TEST_INDEX;
-    tc->status = DUMMY_TEST_UNDEFINED;
+    test->status = DUMMY_TEST_UNDEFINED;
 
     return passed;
 }
@@ -208,17 +234,17 @@ dummyTest* dummyGetCurrentTest()
 
     assert(ctx->currentTestIndex >= 0);
     assert(ctx->currentTestIndex < DUMMY_MAX_TESTS);
-    dummyTest* tc = &ctx->tests[ctx->currentTestIndex];
+    dummyTest* test = &ctx->tests[ctx->currentTestIndex];
 
-    return tc;
+    return test;
 }
 
 const char* dummyGetTestName()
 {
-    const dummyTest* tc = dummyGetCurrentTest();
-    assert(tc->name);
-    assert(strlen(tc->name) < DUMMY_MAX_MESSAGE_LENGTH);
-    return tc->name;
+    const dummyTest* test = dummyGetCurrentTest();
+    assert(test->name);
+    assert(strlen(test->name) < DUMMY_MAX_MESSAGE_LENGTH);
+    return test->name;
 }
 
 dummyTestStatus dummyGetTestStatus()
@@ -228,21 +254,21 @@ dummyTestStatus dummyGetTestStatus()
 
 dummyTestResult dummyGetTestResult()
 {
-    const dummyTest* tc = dummyGetCurrentTest();
-    assert(tc->status == DUMMY_TEST_COMPLETED);
-    return tc->result;
+    const dummyTest* test = dummyGetCurrentTest();
+    assert(test->status == DUMMY_TEST_COMPLETED);
+    return test->result;
 }
 
 const char* dummyGetTestAbortReason()
 {
-    const dummyTest* tc = dummyGetCurrentTest();
-    if(tc->status == DUMMY_TEST_COMPLETED)
+    const dummyTest* test = dummyGetCurrentTest();
+    if(test->status == DUMMY_TEST_COMPLETED)
     {
-        assert(tc->abortReason);
-        const int length = strlen(tc->abortReason);
+        assert(test->abortReason);
+        const int length = strlen(test->abortReason);
         assert(length < DUMMY_MAX_MESSAGE_LENGTH);
         if(length > 0)
-            return tc->abortReason;
+            return test->abortReason;
     }
 
     return NULL;
@@ -255,15 +281,15 @@ int dummyTestIsMarkedAsTodo()
 
 const char* dummyGetTestTodoReason()
 {
-    const dummyTest* tc = dummyGetCurrentTest();
+    const dummyTest* test = dummyGetCurrentTest();
 
-    if(tc->markedAsTodo)
+    if(test->markedAsTodo)
     {
-        assert(tc->todoReason);
-        const int length = strlen(tc->todoReason);
+        assert(test->todoReason);
+        const int length = strlen(test->todoReason);
         assert(length < DUMMY_MAX_MESSAGE_LENGTH);
         if(length > 0)
-            return tc->todoReason;
+            return test->todoReason;
     }
 
     return NULL;
@@ -278,15 +304,15 @@ const char* dummyFormatV( const char* format, va_list args )
 
 void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
 {
-    dummyTest* tc = dummyGetCurrentTest();
+    dummyTest* test = dummyGetCurrentTest();
     switch(type)
     {
         case DUMMY_FAIL_TEST:
-            tc->result = DUMMY_TEST_FAILED;
+            test->result = DUMMY_TEST_FAILED;
             break;
 
         case DUMMY_SKIP_TEST:
-            tc->result = DUMMY_TEST_SKIPPED;
+            test->result = DUMMY_TEST_SKIPPED;
             break;
 
         default:
@@ -296,7 +322,7 @@ void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
     {
         va_list args;
         va_start(args, reason);
-        strncpy(tc->abortReason, dummyFormatV(reason, args), DUMMY_MAX_MESSAGE_LENGTH);
+        strncpy(test->abortReason, dummyFormatV(reason, args), DUMMY_MAX_MESSAGE_LENGTH);
         va_end(args);
     }
     abort();
@@ -304,15 +330,28 @@ void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
 
 void dummyMarkTestAsTodo( const char* reason, ... )
 {
-    dummyTest* tc = dummyGetCurrentTest();
-    tc->markedAsTodo = true;
+    dummyTest* test = dummyGetCurrentTest();
+    test->markedAsTodo = true;
     if(reason)
     {
         va_list args;
         va_start(args, reason);
-        strncpy(tc->todoReason, dummyFormatV(reason, args), DUMMY_MAX_MESSAGE_LENGTH);
+        strncpy(test->todoReason, dummyFormatV(reason, args), DUMMY_MAX_MESSAGE_LENGTH);
         va_end(args);
     }
+}
+
+void dummyLog( const char* message, ... )
+{
+    const dummyContext* ctx = dummyCurrentContext;
+    assert(ctx);
+
+    va_list args;
+    va_start(args, message);
+    const char* formattedMessage = dummyFormatV(message, args);
+    va_end(args);
+
+    ctx->reporter->log(ctx->reporter->context, formattedMessage);
 }
 
 
@@ -360,18 +399,12 @@ void dummySignalHandler( int signal )
         longjmp(environment->jumpBuffer, 1);
 }
 
-bool dummyProtectedCall( dummyTestFunction fn )
+bool dummyProtectedCall( dummyProtectableFunction fn )
 {
     dummyEnvironment* environment = dummyPushEnvironment();
     const int jumpResult = setjmp(environment->jumpBuffer);
     if(jumpResult == 0)
-    {
         fn();
-    }
-    else
-    {
-        // fn aborted
-    }
     dummyPopEnvironment();
     return jumpResult == 0;
 }

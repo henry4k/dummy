@@ -1,3 +1,4 @@
+#include <stdlib.h> // malloc, free
 #include <stddef.h> // NULL
 #include <assert.h>
 #include "../dummy/core.h"
@@ -53,6 +54,32 @@ void TodoWithReasonTest()
     dummyMarkTestAsTodo("TODO with a reason");
 }
 
+int* CreateInt( int value )
+{
+    int* value_ = malloc(sizeof(int));
+    *value_ = value;
+    dummyLog("created %d", value);
+    return value_;
+}
+
+void CleanupInt( void* value_ )
+{
+    int* value = (int*)value_;
+    dummyLog("cleaned %d", *value);
+    free(value);
+}
+
+void PassingCleanupTest()
+{
+    CleanupInt(CreateInt(42));
+}
+
+void FailingCleanupTest()
+{
+    CleanupInt(CreateInt(42));
+    dummyAbortTest(DUMMY_FAIL_TEST, NULL);
+}
+
 int main()
 {
     dummyInit(dummyGetMaxReporter());
@@ -66,6 +93,8 @@ int main()
     dummyAddTest("SkipWithReasonTest", SkipWithReasonTest);
     dummyAddTest("TodoTest", TodoTest);
     dummyAddTest("TodoWithReasonTest", TodoWithReasonTest);
+    dummyAddTest("PassingCleanupTest", PassingCleanupTest);
+    dummyAddTest("FailingCleanupTest", FailingCleanupTest);
     dummyRunTests();
     return 0;
 }
