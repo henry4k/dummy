@@ -1,4 +1,5 @@
 #include "../dummy/core.h"
+#include "../dummy/signal_runner.h"
 #include "../dummy/bdd.hpp"
 
 #include "test_reporter.h"
@@ -8,7 +9,7 @@ using namespace dummy;
 
 int main()
 {
-    dummyInit(dummyGetTestReporter());
+    dummyInit(dummyGetSignalRunner(), dummyGetTestReporter());
 
     Describe("fizzbuzzer module")
         .it("does things", [](){

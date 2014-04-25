@@ -5,6 +5,5 @@ include_rules
 
 LDFLAGS += ../dummy/dummy.a
 
-: protected_call.o | ../dummy/dummy.a |> !ldcc |> protected_call
 : test_reporter.o core.o | ../dummy/dummy.a |> !ldcc |> core
 : test_reporter.o bdd.o | ../dummy/dummy.a |> !ldcxx |> bdd

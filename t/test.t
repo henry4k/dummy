@@ -17,7 +17,6 @@ function Test()
     fi
 }
 
-echo '1..3'
-Test "protected_call"
+echo '1..2'
 Test "core"
 Test "bdd"

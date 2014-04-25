@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#include "protected_call.h"
 #include "core.h"
 
 
@@ -13,9 +12,35 @@ enum
 {
     DUMMY_MAX_MESSAGE_LENGTH = 127,
     DUMMY_MAX_TESTS = 32,
+    DUMMY_MAX_CLEANUPS = 32,
     DUMMY_INVALID_TEST_INDEX = -1,
-    DUMMY_PROTECTED_CALL_SKIPPED = -1
+    DUMMY_RUNNER_SKIPPED = -1
 };
+
+typedef enum
+{
+    DUMMY_INITIALIZING,
+    DUMMY_RUNNING,
+    DUMMY_COMPLETED
+} dummyStatus;
+
+typedef enum
+{
+    DUMMY_TEST_UNDEFINED,
+    DUMMY_TEST_STARTING,
+    DUMMY_TEST_RUNNING,
+    DUMMY_TEST_COMPLETED
+} dummyTestStatus;
+
+/**
+ * Is called after the test has been completed -
+ * regardless of whether it failed or succeeded.
+ */
+typedef struct
+{
+    dummyCleanupFunction fn;
+    void* data;
+} dummyCleanup;
 
 typedef struct
 {
@@ -28,16 +53,19 @@ typedef struct
 
     bool markedAsTodo;
     char todoReason[DUMMY_MAX_MESSAGE_LENGTH];
+
+    dummyCleanup cleanupStack[DUMMY_MAX_CLEANUPS];
+    int cleanupStackSize;
 } dummyTest;
 
 typedef struct
 {
-    const dummyReporter* reporter;
     dummyStatus status;
+    const dummyRunner* runner;
+    const dummyReporter* reporter;
 
     dummyTest tests[DUMMY_MAX_TESTS];
     int testCount;
-
     int currentTestIndex;
 } dummyContext;
 
@@ -48,11 +76,18 @@ dummyContext* dummyCurrentContext = NULL;
 bool dummyRunTest( int index );
 dummyTest* dummyGetCurrentTest();
 
-void dummyInit( const dummyReporter* reporter )
+void dummyInit( const dummyRunner* runner, const dummyReporter* reporter )
 {
     assert(dummyCurrentContext == NULL);
     dummyCurrentContext = malloc(sizeof(dummyContext));
     memset(dummyCurrentContext, 0, sizeof(dummyContext));
+
+    dummyCurrentContext->status = DUMMY_INITIALIZING;
+
+    assert(runner);
+    assert(runner->run);
+    assert(runner->abort);
+    dummyCurrentContext->runner = runner;
 
     assert(reporter);
     assert(reporter->began);
@@ -62,7 +97,6 @@ void dummyInit( const dummyReporter* reporter )
     assert(reporter->log);
     dummyCurrentContext->reporter = reporter;
 
-    dummyCurrentContext->status = DUMMY_INITIALIZING;
     dummyCurrentContext->currentTestIndex = DUMMY_INVALID_TEST_INDEX;
 }
 
@@ -91,7 +125,7 @@ int dummyRunTests()
     return failedTests;
 }
 
-int dummyAddTest( const char* name, dummyTestFunction fn )
+void dummyAddTest( const char* name, dummyTestFunction fn )
 {
     dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
@@ -105,8 +139,6 @@ int dummyAddTest( const char* name, dummyTestFunction fn )
     test->fn = fn;
 
     ctx->testCount++;
-
-    return ctx->testCount-1;
 }
 
 bool dummyRunTest( int index )
@@ -128,18 +160,18 @@ bool dummyRunTest( int index )
     // run
     test->status = DUMMY_TEST_RUNNING;
     const char* abortReason = NULL;
-    const int errorCode = dummyProtectedCall(test->fn, &abortReason);
+    const int errorCode = ctx->runner->run(ctx->runner->context, test->fn, &abortReason);
     switch(errorCode)
     {
-        case DUMMY_PROTECTED_CALL_SUCEEDED:
+        case DUMMY_RUNNER_SUCEEDED:
             test->result = DUMMY_TEST_PASSED;
             break;
 
-        case DUMMY_PROTECTED_CALL_SKIPPED:
+        case DUMMY_RUNNER_SKIPPED:
             test->result = DUMMY_TEST_SKIPPED;
             break;
 
-        case DUMMY_PROTECTED_CALL_GENERIC_ERROR:
+        case DUMMY_RUNNER_GENERIC_ERROR:
         default:
             test->result = DUMMY_TEST_FAILED;
     }
@@ -147,20 +179,19 @@ bool dummyRunTest( int index )
         strncpy(test->abortReason, abortReason, DUMMY_MAX_MESSAGE_LENGTH);
     test->status = DUMMY_TEST_COMPLETED;
 
+    for(int i = 0; i < test->cleanupStackSize; i++)
+    {
+        dummyCleanup* cleanup = &test->cleanupStack[i];
+        cleanup->fn(cleanup->data);
+    }
+    test->cleanupStackSize = 0;
+
     // cleanup
     ctx->reporter->completedTest(ctx->reporter->context);
     ctx->currentTestIndex = DUMMY_INVALID_TEST_INDEX;
     test->status = DUMMY_TEST_UNDEFINED;
 
     return test->result != DUMMY_TEST_FAILED;
-}
-
-dummyStatus dummyGetStatus()
-{
-    dummyContext* ctx = dummyCurrentContext;
-    assert(ctx);
-
-    return ctx->status;
 }
 
 int dummyGetTestCount()
@@ -202,11 +233,6 @@ const char* dummyGetTestName()
     return test->name;
 }
 
-dummyTestStatus dummyGetTestStatus()
-{
-    return dummyGetCurrentTest()->status;
-}
-
 dummyTestResult dummyGetTestResult()
 {
     const dummyTest* test = dummyGetCurrentTest();
@@ -227,6 +253,19 @@ const char* dummyGetTestAbortReason()
     }
 
     return NULL;
+}
+
+void dummyAddCleanup( dummyCleanupFunction fn, void* data )
+{
+    dummyTest* test = dummyGetCurrentTest();
+
+    assert(test->cleanupStackSize < DUMMY_MAX_CLEANUPS);
+    dummyCleanup* cleanup = &test->cleanupStack[test->cleanupStackSize];
+
+    cleanup->fn = fn;
+    cleanup->data = data;
+
+    test->cleanupStackSize++;
 }
 
 int dummyTestIsMarkedAsTodo()
@@ -259,15 +298,15 @@ const char* dummyFormatV( const char* format, va_list args )
 
 void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
 {
-    int errorCode = DUMMY_PROTECTED_CALL_GENERIC_ERROR;
+    int errorCode = DUMMY_RUNNER_GENERIC_ERROR;
     switch(type)
     {
         case DUMMY_FAIL_TEST:
-            errorCode = DUMMY_PROTECTED_CALL_GENERIC_ERROR;
+            errorCode = DUMMY_RUNNER_GENERIC_ERROR;
             break;
 
         case DUMMY_SKIP_TEST:
-            errorCode = DUMMY_PROTECTED_CALL_SKIPPED;
+            errorCode = DUMMY_RUNNER_SKIPPED;
             break;
 
         default:
@@ -283,7 +322,8 @@ void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
         va_end(args);
     }
 
-    dummyAbortProtectedCall(errorCode, formattedReason);
+    dummyContext* ctx = dummyCurrentContext;
+    ctx->runner->abort(ctx->runner->context, errorCode, formattedReason);
 }
 
 void dummyMarkTestAsTodo( const char* reason, ... )

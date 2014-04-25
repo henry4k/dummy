@@ -13,21 +13,6 @@ enum
 
 typedef enum
 {
-    DUMMY_INITIALIZING,
-    DUMMY_RUNNING,
-    DUMMY_COMPLETED
-} dummyStatus;
-
-typedef enum
-{
-    DUMMY_TEST_UNDEFINED,
-    DUMMY_TEST_STARTING,
-    DUMMY_TEST_RUNNING,
-    DUMMY_TEST_COMPLETED
-} dummyTestStatus;
-
-typedef enum
-{
     DUMMY_TEST_PASSED,
     DUMMY_TEST_FAILED,
     DUMMY_TEST_SKIPPED
@@ -38,6 +23,49 @@ typedef enum
     DUMMY_FAIL_TEST,
     DUMMY_SKIP_TEST
 } dummyTestAbortType;
+
+enum
+{
+    DUMMY_RUNNER_SUCEEDED = 0,
+    DUMMY_RUNNER_GENERIC_ERROR = 1
+};
+
+/**
+ * Function that is called for a test.
+ */
+typedef void (*dummyTestFunction)();
+
+typedef void (*dummyCleanupFunction)( void* data );
+
+typedef struct
+{
+    void* context;
+
+    /**
+    * Runs the given function and catches errors.
+    *
+    * @param abortReason
+    * If the protected call is aborted with a reason,
+    * the string pointer is passed here.
+    *
+    * @return
+    * Code that classifies the error.
+    * If the function ras successfully it returns DUMMY_PROTECTED_CALL_SUCEEDED.
+    * Custom error codes may be passed using dummyRunner::abort().
+    */
+    int (*run)( void* context, dummyTestFunction fn, const char** abortReason );
+
+    /**
+    * Aborts the current test.
+    *
+    * @param reason
+    * May be `NULL`.
+    *
+    * @return
+    * Doesn't return.
+    */
+    void (*abort)( void* context, int errorCode, const char* reason );
+} dummyRunner;
 
 typedef struct
 {
@@ -52,11 +80,6 @@ typedef struct
     void (*log)( void* context, const char* message );
 } dummyReporter;
 
-/**
- * Function that is called for a test.
- */
-typedef void (*dummyTestFunction)();
-
 
 /**
  * Initializes the test context.
@@ -67,7 +90,7 @@ typedef void (*dummyTestFunction)();
  * @param reporter
  * Reporter which will be used by the created context.
  */
-void dummyInit( const dummyReporter* reporter );
+void dummyInit( const dummyRunner* runner, const dummyReporter* reporter );
 
 /**
  * Runs all added tests and destroys the current context.
@@ -86,16 +109,8 @@ int dummyRunTests();
  * @param fn
  * Is called when the test is being run.
  * See #dummyRunTests
- *
- * @return
- * Id of the test.
  */
-int dummyAddTest( const char* name, dummyTestFunction fn );
-
-/**
- * Status of the current context.
- */
-dummyStatus dummyGetStatus();
+void dummyAddTest( const char* name, dummyTestFunction fn );
 
 /**
  * Count of tests added to the current context.
@@ -113,11 +128,6 @@ const char* dummyGetTestName();
 int dummyGetTestNumber();
 
 /**
- * Status of the active test in the current context.
- */
-dummyTestStatus dummyGetTestStatus();
-
-/**
  * TODO
  */
 dummyTestResult dummyGetTestResult();
@@ -127,6 +137,14 @@ dummyTestResult dummyGetTestResult();
  * or `NULL` if the test hasn't failed (yet).
  */
 const char* dummyGetTestAbortReason();
+
+/**
+ * Adds a cleanup function to the current test.
+ *
+ * @param data
+ * Data pointer that is passed to the cleanup function.
+ */
+void dummyAddCleanup( dummyCleanupFunction fn, void* data );
 
 int dummyTestIsMarkedAsTodo();
 
