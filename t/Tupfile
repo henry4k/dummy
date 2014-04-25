@@ -6,4 +6,5 @@ include_rules
 LDFLAGS += ../dummy/dummy.a
 
 : test_reporter.o core.o | ../dummy/dummy.a |> !ldcc |> core
+: test_reporter.o cpp.o | ../dummy/dummy.a |> !ldcxx |> cpp
 : test_reporter.o bdd.o | ../dummy/dummy.a |> !ldcxx |> bdd
