@@ -45,7 +45,7 @@ void PassingDestructorTest()
 void FailingDestructorTest()
 {
     Foo foo(42);
-    dummyAbortTest(DUMMY_FAIL_TEST, NULL);
+    dummyAbortTest(DUMMY_FAIL_TEST, "Destructor test failed.");
 }
 
 int main()

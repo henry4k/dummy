@@ -2,7 +2,7 @@ test count = 5
 test number = 0
 test name = 'UnknownExceptionTest'
 test result = 'failed'
-test abort reason = '(null)'
+test abort reason = 'An unknown exception has been thrown.'
 test todo = 0
 test todo reason = '(null)'
 test done
@@ -34,7 +34,7 @@ test name = 'FailingDestructorTest'
 created Foo with 42
 destroyed Foo with 42
 test result = 'failed'
-test abort reason = '(null)'
+test abort reason = 'destroyed Foo with 42'
 test todo = 0
 test todo reason = '(null)'
 test done

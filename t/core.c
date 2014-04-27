@@ -20,12 +20,7 @@ void AssertTest()
 
 void FailTest()
 {
-    dummyAbortTest(DUMMY_FAIL_TEST, NULL);
-}
-
-void FailWithReasonTest()
-{
-    dummyAbortTest(DUMMY_FAIL_TEST, "Failed with a reason");
+    dummyAbortTest(DUMMY_FAIL_TEST, "Fail reason");
 }
 
 void PassingRequireTest()
@@ -40,22 +35,17 @@ void FailingRequireTest()
 
 void SkipTest()
 {
-    dummyAbortTest(DUMMY_SKIP_TEST, NULL);
+    dummyAbortTest(DUMMY_SKIP_TEST, "Skip reason");
 }
 
-void SkipWithReasonTest()
-{
-    dummyAbortTest(DUMMY_SKIP_TEST, "Skipped with a reason");
-}
-
-void TodoTest()
+void TodoWithoutReasonTest()
 {
     dummyMarkTestAsTodo(NULL);
 }
 
 void TodoWithReasonTest()
 {
-    dummyMarkTestAsTodo("TODO with a reason");
+    dummyMarkTestAsTodo("TODO reason");
 }
 
 int* CreateInt( int value )
@@ -83,7 +73,7 @@ void FailingCleanupTest()
 {
     void* data = CreateInt(42);
     dummyAddCleanup(CleanupInt, data);
-    dummyAbortTest(DUMMY_FAIL_TEST, NULL);
+    dummyAbortTest(DUMMY_FAIL_TEST, "Fail reason");
 }
 
 int main()
@@ -92,12 +82,10 @@ int main()
     dummyAddTest("PassingTest", PassingTest);
     dummyAddTest("AssertTest", AssertTest);
     dummyAddTest("FailTest", FailTest);
-    dummyAddTest("FailWithReasonTest", FailWithReasonTest);
     dummyAddTest("PassingRequireTest", PassingRequireTest);
     dummyAddTest("FailingRequireTest", FailingRequireTest);
     dummyAddTest("SkipTest", SkipTest);
-    dummyAddTest("SkipWithReasonTest", SkipWithReasonTest);
-    dummyAddTest("TodoTest", TodoTest);
+    dummyAddTest("TodoWithoutReasonTest", TodoWithoutReasonTest);
     dummyAddTest("TodoWithReasonTest", TodoWithReasonTest);
     dummyAddTest("PassingCleanupTest", PassingCleanupTest);
     dummyAddTest("FailingCleanupTest", FailingCleanupTest);
