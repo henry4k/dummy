@@ -1,4 +1,4 @@
-test count = 4
+test count = 5
 test number = 0
 test name = 'UnknownExceptionTest'
 test result = 'failed'
@@ -14,6 +14,13 @@ test todo = 0
 test todo reason = '(null)'
 test done
 test number = 2
+test name = 'AbortTest'
+test result = 'failed'
+test abort reason = 'This is the reason.'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 3
 test name = 'PassingDestructorTest'
 created Foo with 42
 destroyed Foo with 42
@@ -22,7 +29,7 @@ test abort reason = '(null)'
 test todo = 0
 test todo reason = '(null)'
 test done
-test number = 3
+test number = 4
 test name = 'FailingDestructorTest'
 created Foo with 42
 destroyed Foo with 42

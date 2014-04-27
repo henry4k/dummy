@@ -15,6 +15,11 @@ void StdExceptionTest()
     throw std::logic_error("This should fail");
 }
 
+void AbortTest()
+{
+    dummyAbortTest(DUMMY_FAIL_TEST, "This is the reason.");
+}
+
 class Foo
 {
 public:
@@ -48,6 +53,7 @@ int main()
     dummyInit(dummyGetExceptionRunner(), dummyGetTestReporter());
     dummyAddTest("UnknownExceptionTest", UnknownExceptionTest);
     dummyAddTest("StdExceptionTest", StdExceptionTest);
+    dummyAddTest("AbortTest", AbortTest);
     dummyAddTest("PassingDestructorTest", PassingDestructorTest);
     dummyAddTest("FailingDestructorTest", FailingDestructorTest);
     dummyRunTests();
