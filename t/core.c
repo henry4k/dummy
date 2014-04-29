@@ -50,7 +50,7 @@ void TodoWithReasonTest()
 
 int* CreateInt( int value )
 {
-    int* value_ = malloc(sizeof(int));
+    int* value_ = (int*)malloc(sizeof(int));
     *value_ = value;
     dummyLog("created %d", value);
     return value_;
