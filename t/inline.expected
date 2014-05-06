@@ -1,0 +1,23 @@
+test count = 3
+test number = 0
+test name = 'Fizzbuzzer does things'
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 1
+test name = 'Fizzbuzzer is a slacker'
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 1
+test todo reason = 'Implement lazyness'
+test done
+test number = 2
+test name = 'Fizzbuzzer can't handle bloops'
+test result = 'skipped'
+test abort reason = 'Exception not implemented yet'
+test todo = 1
+test todo reason = 'Implement exception'
+test done
+testing done
