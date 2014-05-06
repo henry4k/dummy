@@ -1,7 +1,7 @@
 #ifndef __DUMMY_TEST_REPORTER_H__
 #define __DUMMY_TEST_REPORTER_H__
 
-#include "../dummy/core.h"
+#include <dummy/core.h>
 
 #ifdef __cplusplus
 extern "C"

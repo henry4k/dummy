@@ -2,9 +2,9 @@
 #include <stddef.h> // NULL
 #include <assert.h>
 
-#include "../dummy/core.h"
-#include "../dummy/signal_runner.h"
-#include "../dummy/require.h"
+#include <dummy/core.h>
+#include <dummy/signal_runner.h>
+#include <dummy/require.h>
 
 #include "test_reporter.h"
 

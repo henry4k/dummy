@@ -17,7 +17,8 @@ function Test()
     fi
 }
 
-echo '1..3'
+echo '1..4'
 Test "core"
 Test "cpp"
+Test "inline"
 Test "bdd"

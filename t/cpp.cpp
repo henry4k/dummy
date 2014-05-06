@@ -1,6 +1,7 @@
 #include <stdexcept> // logic error
-#include "../dummy/core.h"
-#include "../dummy/exception_runner.h"
+
+#include <dummy/core.h>
+#include <dummy/exception_runner.h>
 
 #include "test_reporter.h"
 

@@ -1,6 +1,6 @@
-#include "../dummy/core.h"
-#include "../dummy/exception_runner.h"
-#include "../dummy/bdd.hpp"
+#include <dummy/core.h>
+#include <dummy/exception_runner.h>
+#include <dummy/bdd.hpp>
 
 #include "test_reporter.h"
 
