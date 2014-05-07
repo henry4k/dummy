@@ -8,7 +8,7 @@ typedef struct InlineTest_
 {
     const char* name;
     dummyTestFunction fn;
-    InlineTest_* next;
+    struct InlineTest_* next;
 } InlineTest;
 
 static InlineTest* FirstInlineTest = NULL;
