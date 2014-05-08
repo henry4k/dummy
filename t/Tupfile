@@ -1,11 +1,13 @@
 include_rules
 
 DUMMY_A = $(ROOT)/dummy/dummy.a
+DUMMY_CONFIG = $(ROOT)/dummy/config.h
+
 CFLAGS += -I$(ROOT)
 LDFLAGS += $(DUMMY_A)
 
-: foreach *.c |> !cc |> %B.o
-: foreach *.cpp |> !cxx |> %B.o
+: foreach *.c | $(DUMMY_CONFIG) |> !cc |> %B.o
+: foreach *.cpp | $(DUMMY_CONFIG) |> !cxx |> %B.o
 
 : test_reporter.o core.o | $(DUMMY_A) |> !ldcc |> core
 : test_reporter.o cpp.o | $(DUMMY_A) |> !ldcxx |> cpp

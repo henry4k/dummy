@@ -1,0 +1,8 @@
+#ifndef __DUMMY_CONFIG_H__
+#define __DUMMY_CONFIG_H__
+
+#if @CXX_MODE@ == y
+#define DUMMY_CXX_MODE
+#endif
+
+#endif
