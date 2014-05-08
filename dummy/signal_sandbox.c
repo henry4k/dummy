@@ -5,7 +5,7 @@
 
 
 #include "signal.h"
-#include "signal_runner.h"
+#include "signal_sandbox.h"
 
 
 enum
@@ -43,11 +43,11 @@ static void signalHandler( int signal )
     assert(currentContext);
 
     // If setAbortInformation has not been called before:
-    if(currentContext->errorCode == DUMMY_RUNNER_SUCEEDED)
+    if(currentContext->errorCode == DUMMY_SANDBOX_SUCEEDED)
     {
         setAbortInformation(
             currentContext,
-            DUMMY_RUNNER_GENERIC_ERROR,
+            DUMMY_SANDBOX_GENERIC_ERROR,
             dummySignalToAbortReason(signal));
     }
 
@@ -58,7 +58,7 @@ static int runTest( void* context_, dummyTestFunction fn, const char** abortReas
 {
     Context* context = (Context*)context_;
     memset(context, 0, sizeof(Context));
-    context->errorCode = DUMMY_RUNNER_SUCEEDED;
+    context->errorCode = DUMMY_SANDBOX_SUCEEDED;
 
     dummySetSignals(signalHandler);
     currentContext = context;
@@ -81,16 +81,16 @@ static int runTest( void* context_, dummyTestFunction fn, const char** abortReas
     return context->errorCode;
 }
 
-const dummyRunner* dummyGetSignalRunner()
+const dummySandbox* dummyGetSignalSandbox()
 {
     static Context context;
-    static dummyRunner runner;
+    static dummySandbox sandbox;
 
     memset(&context, 0, sizeof(Context));
 
-    runner.context = &context;
-    runner.run = runTest;
-    runner.abort = abortTest;
+    sandbox.context = &context;
+    sandbox.run = runTest;
+    sandbox.abort = abortTest;
 
-    return &runner;
+    return &sandbox;
 }

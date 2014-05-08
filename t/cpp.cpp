@@ -1,7 +1,7 @@
 #include <stdexcept> // logic error
 
 #include <dummy/core.h>
-#include <dummy/exception_runner.h>
+#include <dummy/exception_sandbox.h>
 
 #include "test_reporter.h"
 
@@ -51,7 +51,7 @@ void FailingDestructorTest()
 
 int main()
 {
-    dummyInit(dummyGetExceptionRunner(), dummyGetTestReporter());
+    dummyInit(dummyGetExceptionSandbox(), dummyGetTestReporter());
     dummyAddTest("UnknownExceptionTest", UnknownExceptionTest);
     dummyAddTest("StdExceptionTest", StdExceptionTest);
     dummyAddTest("AbortTest", AbortTest);

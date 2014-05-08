@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #include <dummy/core.h>
-#include <dummy/signal_runner.h>
+#include <dummy/signal_sandbox.h>
 #include <dummy/require.h>
 
 #include "test_reporter.h"
@@ -78,7 +78,7 @@ void FailingCleanupTest()
 
 int main()
 {
-    dummyInit(dummyGetSignalRunner(), dummyGetTestReporter());
+    dummyInit(dummyGetSignalSandbox(), dummyGetTestReporter());
     dummyAddTest("PassingTest", PassingTest);
     dummyAddTest("AssertTest", AssertTest);
     dummyAddTest("FailTest", FailTest);

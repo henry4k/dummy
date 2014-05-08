@@ -1,5 +1,5 @@
 #include <dummy/core.h>
-#include <dummy/exception_runner.h>
+#include <dummy/exception_sandbox.h>
 #include <dummy/bdd.hpp>
 
 #include "test_reporter.h"
@@ -9,7 +9,7 @@ using namespace dummy;
 
 int main()
 {
-    dummyInit(dummyGetExceptionRunner(), dummyGetTestReporter());
+    dummyInit(dummyGetExceptionSandbox(), dummyGetTestReporter());
 
     Describe("fizzbuzzer module")
         .it("does things", [](){

@@ -14,7 +14,7 @@ enum
     DUMMY_MAX_TESTS = 32,
     DUMMY_MAX_CLEANUPS = 32,
     DUMMY_INVALID_TEST_INDEX = -1,
-    DUMMY_RUNNER_SKIPPED = -1
+    DUMMY_SANDBOX_SKIPPED = -1
 };
 
 typedef enum
@@ -61,7 +61,7 @@ typedef struct
 typedef struct
 {
     dummyStatus status;
-    const dummyRunner* runner;
+    const dummySandbox* sandbox;
     const dummyReporter* reporter;
 
     dummyTest tests[DUMMY_MAX_TESTS];
@@ -76,7 +76,7 @@ dummyContext* dummyCurrentContext = NULL;
 bool dummyRunTest( int index );
 dummyTest* dummyGetCurrentTest();
 
-void dummyInit( const dummyRunner* runner, const dummyReporter* reporter )
+void dummyInit( const dummySandbox* sandbox, const dummyReporter* reporter )
 {
     assert(dummyCurrentContext == NULL);
     dummyCurrentContext = (dummyContext*)malloc(sizeof(dummyContext));
@@ -84,10 +84,10 @@ void dummyInit( const dummyRunner* runner, const dummyReporter* reporter )
 
     dummyCurrentContext->status = DUMMY_INITIALIZING;
 
-    assert(runner);
-    assert(runner->run);
-    assert(runner->abort);
-    dummyCurrentContext->runner = runner;
+    assert(sandbox);
+    assert(sandbox->run);
+    assert(sandbox->abort);
+    dummyCurrentContext->sandbox = sandbox;
 
     assert(reporter);
     assert(reporter->began);
@@ -160,18 +160,18 @@ bool dummyRunTest( int index )
     // run
     test->status = DUMMY_TEST_RUNNING;
     const char* abortReason = NULL;
-    const int errorCode = ctx->runner->run(ctx->runner->context, test->fn, &abortReason);
+    const int errorCode = ctx->sandbox->run(ctx->sandbox->context, test->fn, &abortReason);
     switch(errorCode)
     {
-        case DUMMY_RUNNER_SUCEEDED:
+        case DUMMY_SANDBOX_SUCEEDED:
             test->result = DUMMY_TEST_PASSED;
             break;
 
-        case DUMMY_RUNNER_SKIPPED:
+        case DUMMY_SANDBOX_SKIPPED:
             test->result = DUMMY_TEST_SKIPPED;
             break;
 
-        case DUMMY_RUNNER_GENERIC_ERROR:
+        case DUMMY_SANDBOX_GENERIC_ERROR:
         default:
             test->result = DUMMY_TEST_FAILED;
     }
@@ -298,15 +298,15 @@ const char* dummyFormatV( const char* format, va_list args )
 
 void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
 {
-    int errorCode = DUMMY_RUNNER_GENERIC_ERROR;
+    int errorCode = DUMMY_SANDBOX_GENERIC_ERROR;
     switch(type)
     {
         case DUMMY_FAIL_TEST:
-            errorCode = DUMMY_RUNNER_GENERIC_ERROR;
+            errorCode = DUMMY_SANDBOX_GENERIC_ERROR;
             break;
 
         case DUMMY_SKIP_TEST:
-            errorCode = DUMMY_RUNNER_SKIPPED;
+            errorCode = DUMMY_SANDBOX_SKIPPED;
             break;
 
         default:
@@ -327,7 +327,7 @@ void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
     }
 
     dummyContext* ctx = dummyCurrentContext;
-    ctx->runner->abort(ctx->runner->context, errorCode, formattedReason);
+    ctx->sandbox->abort(ctx->sandbox->context, errorCode, formattedReason);
 }
 
 void dummyMarkTestAsTodo( const char* reason, ... )

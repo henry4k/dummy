@@ -26,8 +26,8 @@ typedef enum
 
 enum
 {
-    DUMMY_RUNNER_SUCEEDED = 0,
-    DUMMY_RUNNER_GENERIC_ERROR = 1
+    DUMMY_SANDBOX_SUCEEDED = 0,
+    DUMMY_SANDBOX_GENERIC_ERROR = 1
 };
 
 /**
@@ -42,30 +42,30 @@ typedef struct
     void* context;
 
     /**
-    * Runs the given function and catches errors.
-    *
-    * @param abortReason
-    * If the protected call is aborted with a reason,
-    * the string pointer is passed here.
-    *
-    * @return
-    * Code that classifies the error.
-    * If the function ras successfully it returns DUMMY_PROTECTED_CALL_SUCEEDED.
-    * Custom error codes may be passed using dummyRunner::abort().
-    */
+     * Runs the given function and catches errors.
+     *
+     * @param abortReason
+     * If the protected call is aborted with a reason,
+     * the string pointer is passed here.
+     *
+     * @return
+     * Code that classifies the error.
+     * If the function ras successfully it returns DUMMY_PROTECTED_CALL_SUCEEDED.
+     * Custom error codes may be passed using dummySandbox::abort().
+     */
     int (*run)( void* context, dummyTestFunction fn, const char** abortReason );
 
     /**
-    * Aborts the current test.
-    *
-    * @param reason
-    * May be `NULL`.
-    *
-    * @return
-    * Doesn't return.
-    */
+     * Aborts the current test.
+     *
+     * @param reason
+     * May be `NULL`.
+     *
+     * @return
+     * Doesn't return.
+     */
     void (*abort)( void* context, int errorCode, const char* reason );
-} dummyRunner;
+} dummySandbox;
 
 typedef struct
 {
@@ -90,7 +90,7 @@ typedef struct
  * @param reporter
  * Reporter which will be used by the created context.
  */
-void dummyInit( const dummyRunner* runner, const dummyReporter* reporter );
+void dummyInit( const dummySandbox* sandbox, const dummyReporter* reporter );
 
 /**
  * Runs all added tests and destroys the current context.

@@ -1,5 +1,5 @@
 #include <dummy/core.h>
-#include <dummy/exception_runner.h>
+#include <dummy/exception_sandbox.h>
 #include <dummy/inline.h>
 
 #include "test_reporter.h"
@@ -25,7 +25,7 @@ DUMMY_INLINE_TEST("Fizzbuzzer can't handle bloops")
 
 int main()
 {
-    dummyInit(dummyGetExceptionRunner(), dummyGetTestReporter());
+    dummyInit(dummyGetExceptionSandbox(), dummyGetTestReporter());
     dummyAddInlineTests();
     dummyRunTests();
     return 0;

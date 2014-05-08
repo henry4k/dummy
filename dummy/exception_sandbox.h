@@ -1,5 +1,5 @@
-#ifndef __DUMMY_EXCEPTION_RUNNER_H__
-#define __DUMMY_EXCEPTION_RUNNER_H__
+#ifndef __DUMMY_EXCEPTION_SANDBOX_H__
+#define __DUMMY_EXCEPTION_SANDBOX_H__
 
 #include "core.h"
 #include "config.h"
@@ -13,7 +13,7 @@ extern "C"
 {
 #endif
 
-const dummyRunner* dummyGetExceptionRunner();
+const dummySandbox* dummyGetExceptionSandbox();
 
 #ifdef __cplusplus
 }

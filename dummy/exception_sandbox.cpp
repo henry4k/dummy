@@ -2,7 +2,7 @@
 #include <exception>
 
 #include "signal.h"
-#include "exception_runner.h"
+#include "exception_sandbox.h"
 
 
 class AbortError
@@ -25,13 +25,13 @@ static void abortTest( void* context_, int errorCode, const char* reason )
 
 static void signalHandler( int signal )
 {
-    throw AbortError(DUMMY_RUNNER_GENERIC_ERROR, dummySignalToAbortReason(signal));
+    throw AbortError(DUMMY_SANDBOX_GENERIC_ERROR, dummySignalToAbortReason(signal));
 }
 
 static int runTest( void* context_, dummyTestFunction fn, const char** abortReason )
 {
     const char* reason = NULL;
-    int exitCode = DUMMY_RUNNER_SUCEEDED;
+    int exitCode = DUMMY_SANDBOX_SUCEEDED;
     dummySetSignals(signalHandler);
 
     try
@@ -46,12 +46,12 @@ static int runTest( void* context_, dummyTestFunction fn, const char** abortReas
     catch( std::exception& e )
     {
         reason = e.what();
-        exitCode = DUMMY_RUNNER_GENERIC_ERROR;
+        exitCode = DUMMY_SANDBOX_GENERIC_ERROR;
     }
     catch( ... )
     {
         reason = "An unknown exception has been thrown.";
-        exitCode = DUMMY_RUNNER_GENERIC_ERROR;
+        exitCode = DUMMY_SANDBOX_GENERIC_ERROR;
     }
 
     dummySetSignals(SIG_DFL);
@@ -60,13 +60,13 @@ static int runTest( void* context_, dummyTestFunction fn, const char** abortReas
     return exitCode;
 }
 
-const dummyRunner* dummyGetExceptionRunner()
+const dummySandbox* dummyGetExceptionSandbox()
 {
-    static dummyRunner runner;
+    static dummySandbox sandbox;
 
-    runner.context = NULL;
-    runner.run = runTest;
-    runner.abort = abortTest;
+    sandbox.context = NULL;
+    sandbox.run = runTest;
+    sandbox.abort = abortTest;
 
-    return &runner;
+    return &sandbox;
 }
