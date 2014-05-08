@@ -1,10 +1,14 @@
 #ifndef __DUMMY_CORE_H__
 #define __DUMMY_CORE_H__
 
+#include "sandbox.h"
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
 
 enum
 {
@@ -24,48 +28,8 @@ typedef enum
     DUMMY_SKIP_TEST
 } dummyTestAbortType;
 
-enum
-{
-    DUMMY_SANDBOX_SUCEEDED = 0,
-    DUMMY_SANDBOX_GENERIC_ERROR = 1
-};
-
-/**
- * Function that is called for a test.
- */
-typedef void (*dummyTestFunction)();
 
 typedef void (*dummyCleanupFunction)( void* data );
-
-typedef struct
-{
-    void* context;
-
-    /**
-     * Runs the given function and catches errors.
-     *
-     * @param abortReason
-     * If the protected call is aborted with a reason,
-     * the string pointer is passed here.
-     *
-     * @return
-     * Code that classifies the error.
-     * If the function ras successfully it returns DUMMY_PROTECTED_CALL_SUCEEDED.
-     * Custom error codes may be passed using dummySandbox::abort().
-     */
-    int (*run)( void* context, dummyTestFunction fn, const char** abortReason );
-
-    /**
-     * Aborts the current test.
-     *
-     * @param reason
-     * May be `NULL`.
-     *
-     * @return
-     * Doesn't return.
-     */
-    void (*abort)( void* context, int errorCode, const char* reason );
-} dummySandbox;
 
 typedef struct
 {
@@ -90,7 +54,7 @@ typedef struct
  * @param reporter
  * Reporter which will be used by the created context.
  */
-void dummyInit( const dummySandbox* sandbox, const dummyReporter* reporter );
+void dummyInit( const dummyReporter* reporter );
 
 /**
  * Runs all added tests and destroys the current context.
@@ -108,9 +72,9 @@ int dummyRunTests();
  *
  * @param fn
  * Is called when the test is being run.
- * See #dummyRunTests
+ * See dummyRunTests
  */
-void dummyAddTest( const char* name, dummyTestFunction fn );
+void dummyAddTest( const char* name, dummySandboxableFunction fn, dummySandbox sandbox ); // TODO
 
 /**
  * Count of tests added to the current context.
@@ -164,7 +128,7 @@ const char* dummyGetTestTodoReason();
  * @return
  * Doesn't return.
  */
-void dummyAbortTest( dummyTestAbortType type, const char* reason, ... );
+void dummyAbortTest( dummyTestAbortType type, const char* reason, ... ); // TODO: Can be replaced with dummyAbortSandbox
 
 /**
  * Marks current test as TODO.
