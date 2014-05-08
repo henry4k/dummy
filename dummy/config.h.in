@@ -1,8 +1,13 @@
 #ifndef __DUMMY_CONFIG_H__
 #define __DUMMY_CONFIG_H__
 
-#if @CXX_MODE@ == y
+#if '@CXX_MODE@' == 'y'
 #define DUMMY_CXX_MODE
 #endif
+
+enum
+{
+    DUMMY_MAX_SANDBOX_DEPTH = 32
+};
 
 #endif
