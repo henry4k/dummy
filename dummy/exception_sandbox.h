@@ -1,7 +1,7 @@
 #ifndef __DUMMY_EXCEPTION_SANDBOX_H__
 #define __DUMMY_EXCEPTION_SANDBOX_H__
 
-#include "core.h"
+#include "sandbox.h"
 #include "config.h"
 
 #if !defined(DUMMY_CXX_MODE)
@@ -13,7 +13,11 @@ extern "C"
 {
 #endif
 
-const dummySandbox* dummyGetExceptionSandbox();
+/**
+ * Run `fn` in a sandbox, that catches exceptions and signals.
+ * @see dummySandbox
+ */
+int dummyExceptionSandbox( dummySandboxableFunction fn, const char** abortReason );
 
 #ifdef __cplusplus
 }

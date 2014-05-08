@@ -31,7 +31,7 @@ static void setAbortInformation( Context* context, int errorCode, const char* re
         strncpy(context->abortReason, reason, MAX_REASON_LENGTH);
 }
 
-static void abortTest( void* context_, int errorCode, const char* reason )
+static void abortHandler( void* context_, int errorCode, const char* reason )
 {
     Context* context = (Context*)context_;
     setAbortInformation(context, errorCode, reason);
@@ -43,7 +43,7 @@ static void signalHandler( int signal )
     assert(currentContext);
 
     // If setAbortInformation has not been called before:
-    if(currentContext->errorCode == DUMMY_SANDBOX_SUCEEDED)
+    if(currentContext->errorCode == DUMMY_SANDBOX_SUCCEEDED)
     {
         setAbortInformation(
             currentContext,
@@ -54,43 +54,31 @@ static void signalHandler( int signal )
     longjmp(currentContext->jumpBuffer, 1);
 }
 
-static int runTest( void* context_, dummyTestFunction fn, const char** abortReason )
+int dummySignalSandbox( dummySandboxableFunction fn, const char** abortReason )
 {
-    Context* context = (Context*)context_;
-    memset(context, 0, sizeof(Context));
-    context->errorCode = DUMMY_SANDBOX_SUCEEDED;
+    Context context;
+    memset(&context, 0, sizeof(Context));
+    context.errorCode = DUMMY_SANDBOX_SUCCEEDED;
 
-    dummySetSignals(signalHandler);
-    currentContext = context;
+    dummyPushAbortHandler(abortHandler, &context);
+    dummyPushSignalHandler(signalHandler);
+    currentContext = &context;
 
-    const int jumpResult = setjmp(context->jumpBuffer);
+    const int jumpResult = setjmp(context.jumpBuffer);
     if(jumpResult == 0)
         fn();
 
     currentContext = NULL;
-    dummySetSignals(SIG_DFL);
+    dummyPopSignalHandler();
+    dummyPopAbortHandler();
 
     // return results
     if(abortReason)
     {
-        if(context->abortReason[0] == '\0')
+        if(context.abortReason[0] == '\0')
             *abortReason = NULL;
         else
-            *abortReason = context->abortReason;
+            *abortReason = context.abortReason;
     }
-    return context->errorCode;
-}
-
-const dummySandbox* dummyGetSignalSandbox()
-{
-    static Context context;
-    static dummySandbox sandbox;
-
-    memset(&context, 0, sizeof(Context));
-
-    sandbox.context = &context;
-    sandbox.run = runTest;
-    sandbox.abort = abortTest;
-
-    return &sandbox;
+    return context.errorCode;
 }

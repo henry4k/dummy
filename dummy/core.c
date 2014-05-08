@@ -45,7 +45,8 @@ typedef struct
 typedef struct
 {
     char name[DUMMY_MAX_MESSAGE_LENGTH];
-    dummyTestFunction fn;
+    dummySandbox sandbox;
+    dummySandboxableFunction fn;
     dummyTestStatus status;
 
     dummyTestResult result;
@@ -61,7 +62,6 @@ typedef struct
 typedef struct
 {
     dummyStatus status;
-    const dummySandbox* sandbox;
     const dummyReporter* reporter;
 
     dummyTest tests[DUMMY_MAX_TESTS];
@@ -76,18 +76,13 @@ dummyContext* dummyCurrentContext = NULL;
 bool dummyRunTest( int index );
 dummyTest* dummyGetCurrentTest();
 
-void dummyInit( const dummySandbox* sandbox, const dummyReporter* reporter )
+void dummyInit( const dummyReporter* reporter )
 {
     assert(dummyCurrentContext == NULL);
     dummyCurrentContext = (dummyContext*)malloc(sizeof(dummyContext));
     memset(dummyCurrentContext, 0, sizeof(dummyContext));
 
     dummyCurrentContext->status = DUMMY_INITIALIZING;
-
-    assert(sandbox);
-    assert(sandbox->run);
-    assert(sandbox->abort);
-    dummyCurrentContext->sandbox = sandbox;
 
     assert(reporter);
     assert(reporter->began);
@@ -125,7 +120,7 @@ int dummyRunTests()
     return failedTests;
 }
 
-void dummyAddTest( const char* name, dummyTestFunction fn )
+void dummyAddTest( const char* name, dummySandboxableFunction fn, dummySandbox sandbox )
 {
     dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
@@ -135,8 +130,9 @@ void dummyAddTest( const char* name, dummyTestFunction fn )
     dummyTest* test = &ctx->tests[ctx->testCount];
     memset(test, 0, sizeof(dummyTest));
 
-    strncpy(test->name, name, DUMMY_MAX_MESSAGE_LENGTH);
+    test->sandbox = sandbox;
     test->fn = fn;
+    strncpy(test->name, name, DUMMY_MAX_MESSAGE_LENGTH);
 
     ctx->testCount++;
 }
@@ -160,10 +156,10 @@ bool dummyRunTest( int index )
     // run
     test->status = DUMMY_TEST_RUNNING;
     const char* abortReason = NULL;
-    const int errorCode = ctx->sandbox->run(ctx->sandbox->context, test->fn, &abortReason);
+    const int errorCode = test->sandbox(test->fn, &abortReason);
     switch(errorCode)
     {
-        case DUMMY_SANDBOX_SUCEEDED:
+        case DUMMY_SANDBOX_SUCCEEDED:
             test->result = DUMMY_TEST_PASSED;
             break;
 
@@ -326,8 +322,7 @@ void dummyAbortTest( dummyTestAbortType type, const char* reason, ... )
         assert(!"dummyAbortTest needs a reason!");
     }
 
-    dummyContext* ctx = dummyCurrentContext;
-    ctx->sandbox->abort(ctx->sandbox->context, errorCode, formattedReason);
+    dummyAbortSandbox(errorCode, formattedReason);
 }
 
 void dummyMarkTestAsTodo( const char* reason, ... )

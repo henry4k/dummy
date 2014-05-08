@@ -8,7 +8,11 @@ extern "C"
 {
 #endif
 
-const dummySandbox* dummyGetSignalSandbox();
+/**
+ * Run `fn` in a sandbox, that catches signals.
+ * @see dummySandbox
+ */
+int dummySignalSandbox( dummySandboxableFunction fn, const char** abortReason );
 
 #ifdef __cplusplus
 }

@@ -17,7 +17,7 @@ enum
 /**
  * Can be called in a sandbox.
  */
-void (*dummySandboxableFunction)();
+typedef void (*dummySandboxableFunction)();
 
 /**
  * Runs the given function and catches errors.
@@ -42,18 +42,18 @@ typedef int (*dummySandbox)( dummySandboxableFunction fn, const char** abortReas
  * @return
  * Doesn't return.
  */
-void (*dummyAbortImplementation)( void* context, int errorCode, const char* reason );
+typedef void (*dummyAbortHandler)( void* context, int errorCode, const char* reason );
 
 
 /**
  * Replaces the current abort implementation.
  */
-void dummyPushAbortImplementation( dummyAbortImplementation implementation, void* context );
+void dummyPushAbortHandler( dummyAbortHandler implementation, void* context );
 
 /**
  * Resets the current abort implementation to the last one or disables it.
  */
-void dummyPopAbortImplementation();
+void dummyPopAbortHandler();
 
 /**
  * Aborts the current sandbox using the current abort implementation.

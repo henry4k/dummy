@@ -73,8 +73,11 @@ int dummyRunTests();
  * @param fn
  * Is called when the test is being run.
  * See dummyRunTests
+ *
+ * @param sandbox
+ * Sandbox that is being used to run the test.
  */
-void dummyAddTest( const char* name, dummySandboxableFunction fn, dummySandbox sandbox ); // TODO
+void dummyAddTest( const char* name, dummySandboxableFunction fn, dummySandbox sandbox );
 
 /**
  * Count of tests added to the current context.

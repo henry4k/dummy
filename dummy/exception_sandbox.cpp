@@ -18,7 +18,7 @@ public:
     }
 };
 
-static void abortTest( void* context_, int errorCode, const char* reason )
+static void abortHandler( void* context, int errorCode, const char* reason )
 {
     throw AbortError(errorCode, reason);
 }
@@ -28,11 +28,13 @@ static void signalHandler( int signal )
     throw AbortError(DUMMY_SANDBOX_GENERIC_ERROR, dummySignalToAbortReason(signal));
 }
 
-static int runTest( void* context_, dummyTestFunction fn, const char** abortReason )
+
+int dummyExceptionSandbox( dummySandboxableFunction fn, const char** abortReason )
 {
     const char* reason = NULL;
-    int exitCode = DUMMY_SANDBOX_SUCEEDED;
-    dummySetSignals(signalHandler);
+    int exitCode = DUMMY_SANDBOX_SUCCEEDED;
+    dummyPushAbortHandler(abortHandler, NULL);
+    dummyPushSignalHandler(signalHandler);
 
     try
     {
@@ -54,19 +56,9 @@ static int runTest( void* context_, dummyTestFunction fn, const char** abortReas
         exitCode = DUMMY_SANDBOX_GENERIC_ERROR;
     }
 
-    dummySetSignals(SIG_DFL);
+    dummyPopSignalHandler();
+    dummyPopAbortHandler();
     if(abortReason)
         *abortReason = reason;
     return exitCode;
-}
-
-const dummySandbox* dummyGetExceptionSandbox()
-{
-    static dummySandbox sandbox;
-
-    sandbox.context = NULL;
-    sandbox.run = runTest;
-    sandbox.abort = abortTest;
-
-    return &sandbox;
 }
