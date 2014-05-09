@@ -10,6 +10,7 @@ LDFLAGS += $(DUMMY_A)
 : foreach *.cpp | $(DUMMY_CONFIG) |> !cxx |> %B.o
 
 : test_reporter.o core.o | $(DUMMY_A) |> !ldcc |> core
+: test_reporter.o sandbox.o | $(DUMMY_A) |> !ldcc |> sandbox
 : test_reporter.o cpp.o | $(DUMMY_A) |> !ldcxx |> cpp
 : test_reporter.o inline.o | $(DUMMY_A) |> !ldcc |> inline
 : test_reporter.o bdd.o | $(DUMMY_A) |> !ldcxx |> bdd

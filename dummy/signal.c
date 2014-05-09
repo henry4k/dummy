@@ -19,8 +19,8 @@ static void setSignalHandler( dummySignalHandler fn )
 void dummyPushSignalHandler( dummySignalHandler fn )
 {
     assert(signalHandlerStackSize < DUMMY_MAX_SANDBOX_DEPTH);
-    signalHandlerStack[signalHandlerStackSize] = fn;
     signalHandlerStackSize++;
+    signalHandlerStack[signalHandlerStackSize-1] = fn;
 
     setSignalHandler(fn);
 }
@@ -30,7 +30,7 @@ void dummyPopSignalHandler()
     assert(signalHandlerStackSize > 0);
     signalHandlerStackSize--;
     if(signalHandlerStackSize > 0)
-        setSignalHandler(signalHandlerStack[signalHandlerStackSize]);
+        setSignalHandler(signalHandlerStack[signalHandlerStackSize-1]);
     else
         setSignalHandler(SIG_DFL);
 }

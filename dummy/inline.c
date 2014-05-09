@@ -7,7 +7,8 @@
 typedef struct InlineTest_
 {
     const char* name;
-    dummyTestFunction fn;
+    dummySandbox sandbox;
+    dummySandboxableFunction fn;
     struct InlineTest_* next;
 } InlineTest;
 
@@ -21,6 +22,7 @@ void dummyAddInlineTests()
     {
         dummyAddTest(
             current->name,
+            current->sandbox,
             current->fn);
 
         InlineTest* previous = current;
@@ -31,10 +33,11 @@ void dummyAddInlineTests()
     LastInlineTest = NULL;
 }
 
-int dummyAddInlineTest_( const char* name, dummyTestFunction fn )
+int dummyAddInlineTest_( const char* name, dummySandbox sandbox, dummySandboxableFunction fn )
 {
     InlineTest* test = (InlineTest*)malloc(sizeof(InlineTest));
     test->name = name;
+    test->sandbox = sandbox;
     test->fn = fn;
 
     if(!FirstInlineTest)

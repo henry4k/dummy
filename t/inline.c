@@ -5,18 +5,18 @@
 #include "test_reporter.h"
 
 
-DUMMY_INLINE_TEST("Fizzbuzzer does things")
+DUMMY_INLINE_TEST("Fizzbuzzer does things", dummyExceptionSandbox)
 {
     // try doing things here
 }
 
-DUMMY_INLINE_TEST("Fizzbuzzer is a slacker")
+DUMMY_INLINE_TEST("Fizzbuzzer is a slacker", dummyExceptionSandbox)
 {
     dummyMarkTestAsTodo("Implement lazyness");
     // prove that fizzbuzzer is lazy as fuck
 }
 
-DUMMY_INLINE_TEST("Fizzbuzzer can't handle bloops")
+DUMMY_INLINE_TEST("Fizzbuzzer can't handle bloops", dummyExceptionSandbox)
 {
     dummyMarkTestAsTodo("Implement exception");
     // dummy if bloops cause fizzbuzzer to fail
@@ -25,7 +25,7 @@ DUMMY_INLINE_TEST("Fizzbuzzer can't handle bloops")
 
 int main()
 {
-    dummyInit(dummyGetExceptionSandbox(), dummyGetTestReporter());
+    dummyInit(dummyGetTestReporter());
     dummyAddInlineTests();
     dummyRunTests();
     return 0;

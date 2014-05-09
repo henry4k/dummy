@@ -78,17 +78,17 @@ void FailingCleanupTest()
 
 int main()
 {
-    dummyInit(dummyGetSignalSandbox(), dummyGetTestReporter());
-    dummyAddTest("PassingTest", PassingTest);
-    dummyAddTest("AssertTest", AssertTest);
-    dummyAddTest("FailTest", FailTest);
-    dummyAddTest("PassingRequireTest", PassingRequireTest);
-    dummyAddTest("FailingRequireTest", FailingRequireTest);
-    dummyAddTest("SkipTest", SkipTest);
-    dummyAddTest("TodoWithoutReasonTest", TodoWithoutReasonTest);
-    dummyAddTest("TodoWithReasonTest", TodoWithReasonTest);
-    dummyAddTest("PassingCleanupTest", PassingCleanupTest);
-    dummyAddTest("FailingCleanupTest", FailingCleanupTest);
+    dummyInit(dummyGetTestReporter());
+    dummyAddTest("PassingTest", dummySignalSandbox, PassingTest);
+    dummyAddTest("AssertTest", dummySignalSandbox, AssertTest);
+    dummyAddTest("FailTest", dummySignalSandbox, FailTest);
+    dummyAddTest("PassingRequireTest", dummySignalSandbox, PassingRequireTest);
+    dummyAddTest("FailingRequireTest", dummySignalSandbox, FailingRequireTest);
+    dummyAddTest("SkipTest", dummySignalSandbox, SkipTest);
+    dummyAddTest("TodoWithoutReasonTest", dummySignalSandbox, TodoWithoutReasonTest);
+    dummyAddTest("TodoWithReasonTest", dummySignalSandbox, TodoWithReasonTest);
+    dummyAddTest("PassingCleanupTest", dummySignalSandbox, PassingCleanupTest);
+    dummyAddTest("FailingCleanupTest", dummySignalSandbox, FailingCleanupTest);
     dummyRunTests();
     return 0;
 }

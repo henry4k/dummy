@@ -62,13 +62,14 @@ int dummySignalSandbox( dummySandboxableFunction fn, const char** abortReason )
 
     dummyPushAbortHandler(abortHandler, &context);
     dummyPushSignalHandler(signalHandler);
+    Context* previousContext = currentContext;
     currentContext = &context;
 
     const int jumpResult = setjmp(context.jumpBuffer);
     if(jumpResult == 0)
         fn();
 
-    currentContext = NULL;
+    currentContext = previousContext;
     dummyPopSignalHandler();
     dummyPopAbortHandler();
 

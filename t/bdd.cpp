@@ -9,9 +9,11 @@ using namespace dummy;
 
 int main()
 {
-    dummyInit(dummyGetExceptionSandbox(), dummyGetTestReporter());
+    dummyInit(dummyGetTestReporter());
 
     Describe("fizzbuzzer module")
+        .use(dummyExceptionSandbox)
+
         .it("does things", [](){
             // try doing things here
         })
@@ -26,6 +28,8 @@ int main()
         });
 
     Describe("bloop")
+        .use(dummyExceptionSandbox)
+
         .it("can make a sound", [](){
             // emulate a sound
             dummyAbortTest(DUMMY_FAIL_TEST, "Bloop is silent!");

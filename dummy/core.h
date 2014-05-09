@@ -70,14 +70,14 @@ int dummyRunTests();
  * @param name
  * May be used by the reporter to describe the test.
  *
+ * @param sandbox
+ * Sandbox that is being used to run the test.
+ *
  * @param fn
  * Is called when the test is being run.
  * See dummyRunTests
- *
- * @param sandbox
- * Sandbox that is being used to run the test.
  */
-void dummyAddTest( const char* name, dummySandboxableFunction fn, dummySandbox sandbox );
+void dummyAddTest( const char* name, dummySandbox sandbox, dummySandboxableFunction fn );
 
 /**
  * Count of tests added to the current context.

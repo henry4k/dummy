@@ -1,0 +1,38 @@
+test count = 4
+test number = 0
+test name = 'signal_test'
+Level1 called!
+Level2 called!
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 1
+test name = 'exception_test'
+Level1 called!
+Level2 called!
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 2
+test name = 'signal_exception_test'
+Level1 called!
+Level2 called!
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 3
+test name = 'exception_signal_test'
+Level1 called!
+Level2 called!
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+testing done

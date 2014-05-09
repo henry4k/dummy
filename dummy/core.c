@@ -47,6 +47,7 @@ typedef struct
     char name[DUMMY_MAX_MESSAGE_LENGTH];
     dummySandbox sandbox;
     dummySandboxableFunction fn;
+
     dummyTestStatus status;
 
     dummyTestResult result;
@@ -120,7 +121,7 @@ int dummyRunTests()
     return failedTests;
 }
 
-void dummyAddTest( const char* name, dummySandboxableFunction fn, dummySandbox sandbox )
+void dummyAddTest( const char* name, dummySandbox sandbox, dummySandboxableFunction fn )
 {
     dummyContext* ctx = dummyCurrentContext;
     assert(ctx);
@@ -130,9 +131,9 @@ void dummyAddTest( const char* name, dummySandboxableFunction fn, dummySandbox s
     dummyTest* test = &ctx->tests[ctx->testCount];
     memset(test, 0, sizeof(dummyTest));
 
+    strncpy(test->name, name, DUMMY_MAX_MESSAGE_LENGTH);
     test->sandbox = sandbox;
     test->fn = fn;
-    strncpy(test->name, name, DUMMY_MAX_MESSAGE_LENGTH);
 
     ctx->testCount++;
 }

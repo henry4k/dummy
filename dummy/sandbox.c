@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdio.h>
 
 #include "config.h"
 #include "sandbox.h"
@@ -17,8 +18,8 @@ static int abortStackSize = 0;
 void dummyPushAbortHandler( dummyAbortHandler handler, void* context )
 {
     assert(abortStackSize <= DUMMY_MAX_SANDBOX_DEPTH);
-    AbortHandlerInfo* info = &abortStack[abortStackSize-1];
     abortStackSize++;
+    AbortHandlerInfo* info = &abortStack[abortStackSize-1];
 
     info->handler = handler;
     info->context = context;

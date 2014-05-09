@@ -51,12 +51,12 @@ void FailingDestructorTest()
 
 int main()
 {
-    dummyInit(dummyGetExceptionSandbox(), dummyGetTestReporter());
-    dummyAddTest("UnknownExceptionTest", UnknownExceptionTest);
-    dummyAddTest("StdExceptionTest", StdExceptionTest);
-    dummyAddTest("AbortTest", AbortTest);
-    dummyAddTest("PassingDestructorTest", PassingDestructorTest);
-    dummyAddTest("FailingDestructorTest", FailingDestructorTest);
+    dummyInit(dummyGetTestReporter());
+    dummyAddTest("UnknownExceptionTest", dummyExceptionSandbox, UnknownExceptionTest);
+    dummyAddTest("StdExceptionTest", dummyExceptionSandbox, StdExceptionTest);
+    dummyAddTest("AbortTest", dummyExceptionSandbox, AbortTest);
+    dummyAddTest("PassingDestructorTest", dummyExceptionSandbox, PassingDestructorTest);
+    dummyAddTest("FailingDestructorTest", dummyExceptionSandbox, FailingDestructorTest);
     dummyRunTests();
     return 0;
 }
