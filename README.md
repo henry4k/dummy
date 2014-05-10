@@ -12,8 +12,8 @@ Features:
 Description
 -----------
 
-At its core, it just consists of a small set of functions, written in C. 
-Since small things tend to break less often than big contraptions. 
+At its core, it just consists of a small set of functions, written in C.  
+Since small things tend to break less often than big contraptions.  
 And a test system is not the kind of code that may break.
 
       [porcelain]
@@ -24,13 +24,13 @@ And a test system is not the kind of code that may break.
           \/
       [reporter]
 
-At first, you need to initialize dummy and register some tests. 
+At first, you need to initialize dummy and register some tests.  
 Then you can tell it to run those tests:
-A sandbox is created for every test and catches errors during the execution. 
-Any events that happen while running the tests are passed to the reporter. 
+A sandbox is created for every test and catches errors during the execution.  
+Any events that happen while running the tests are passed to the reporter.  
 And that's all there is to it - everything else is under your control.
 
-Reporters, API porcelain and sandboxes can be plugged onto it, just as you need it. 
+Reporters, API porcelain and sandboxes can be plugged onto it, just as you need it.  
 Some are already provided, but it shouldn't be hard to write your own.
 
 These are currently provided by dummy:
