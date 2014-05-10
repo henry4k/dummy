@@ -9,7 +9,7 @@ extern "C"
 #endif
 
 /**
- * Reports using the 'dummy anything protocol' (TAP).
+ * Reports using the 'test anything protocol' (TAP).
  */
 const dummyReporter* dummyGetTAPReporter();
 
