@@ -25,7 +25,7 @@ And a test system is not the kind of code that may break.
       [reporter]
 
 At first, you need to initialize dummy and register some tests.  
-Then you can tell it to run those tests:
+Then you can tell it to run those tests:  
 A sandbox is created for every test and catches errors during the execution.  
 Any events that happen while running the tests are passed to the reporter.  
 And that's all there is to it - everything else is under your control.
@@ -56,7 +56,7 @@ Just copy the parts you need into your project,
 since anything except `core.h/c` is optional.
 
 When testing C++ code using the `exception_sandbox`,
-you need to compile `core.c` with a C++ compiler.
+you need to compile `core.c` with a C++ compiler.  
 Because C++ exceptions can't be thrown through C code.
 
 For code examples, just take a look at the test directory.
@@ -71,5 +71,5 @@ Author
 Licence
 -------
 
-This is free and unencumbered public domain software.
+This is free and unencumbered public domain software.  
 For more information, see http://unlicense.org/ or the accompanying `UNLICENSE` file.
