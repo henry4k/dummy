@@ -12,7 +12,7 @@ extern "C"
  * Reports as many information as possible using a custom format.
  *
  * @note
- * It is used for self dummying and not intended to be used externally,
+ * It is used for self testing and not intended to be used externally,
  * since the format may change over time.
  */
 const dummyReporter* dummyGetTestReporter();

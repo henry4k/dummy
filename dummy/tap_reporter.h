@@ -10,6 +10,14 @@ extern "C"
 
 /**
  * Reports using the 'test anything protocol' (TAP).
+ *
+ * Example:
+ * @code
+ * dummyGetTAPReporter(stdout)
+ * @endcode
+ *
+ * @param file
+ * The report is written to `file`.
  */
 const dummyReporter* dummyGetTAPReporter();
 

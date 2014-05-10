@@ -87,7 +87,7 @@ typedef struct
  * Initializes the test context.
  *
  * This needs to be called before any calls to other test functions.
- * The initial context status is `DUMMY_INITIALIZING`.
+ * The initial context status is #DUMMY_INITIALIZING.
  *
  * @param reporter
  * Reporter which will be used by the created context.
@@ -113,7 +113,8 @@ int dummyRunTests();
  *
  * @param fn
  * Is called when the test is being run.
- * See dummyRunTests
+ *
+ * @see dummyRunTests
  */
 void dummyAddTest( const char* name, dummySandbox sandbox, dummySandboxableFunction fn );
 

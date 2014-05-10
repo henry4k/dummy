@@ -10,8 +10,22 @@ extern "C"
 
 /**
  * Reports in a JUnit compatible XML format.
+ *
+ * Example:
+ * @code
+ * dummyGetXMLReporter(stdout, "    ", "\n")
+ * @endcode
+ *
+ * @param file
+ * The report is written to `file`.
+ *
+ * @param tab
+ * Character sequence that is used as a tab for indentation.
+ *
+ * @param newline
+ * Character sequence that is used to separate lines.
  */
-const dummyReporter* dummyGetXMLReporter();
+const dummyReporter* dummyGetXMLReporter( FILE* file, const char* tab, const char* newline );
 
 #ifdef __cplusplus
 }

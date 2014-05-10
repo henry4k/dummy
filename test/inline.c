@@ -19,7 +19,7 @@ DUMMY_INLINE_TEST("Fizzbuzzer is a slacker", dummyExceptionSandbox)
 DUMMY_INLINE_TEST("Fizzbuzzer can't handle bloops", dummyExceptionSandbox)
 {
     dummyMarkTestAsTodo("Implement exception");
-    // dummy if bloops cause fizzbuzzer to fail
+    // test if bloops cause fizzbuzzer to fail
     dummyAbortTest(DUMMY_SKIP_TEST, "Exception not implemented yet");
 }
 

@@ -23,7 +23,7 @@ int main()
         })
         .it("can't handle bloops", [](){
             dummyMarkTestAsTodo("Implement exception");
-            // dummy if bloops cause fizzbuzzer to fail
+            // test if bloops cause fizzbuzzer to fail
             dummyAbortTest(DUMMY_SKIP_TEST, "Exception not implemented yet");
         });
 
