@@ -1,6 +1,7 @@
 #ifndef __DUMMY_XML_REPORTER_H__
 #define __DUMMY_XML_REPORTER_H__
 
+#include <stdio.h> // FILE
 #include "core.h"
 
 #ifdef __cplusplus

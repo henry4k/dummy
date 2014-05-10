@@ -1,0 +1,12 @@
+1..8
+ok 1 PassingTest
+# SIGABRT: Abnormal termination
+not ok 2 AssertTest
+# Fail reason
+not ok 3 FailTest
+ok 4 PassingRequireTest
+# 2+2 == 5 failed
+not ok 5 FailingRequireTest
+ok 6 SkipTest # SKIP Skip reason
+ok 7 TodoWithoutReasonTest # TODO
+ok 8 TodoWithReasonTest # TODO TODO reason

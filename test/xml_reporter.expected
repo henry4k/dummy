@@ -1,0 +1,22 @@
+<testsuite dummys="8">
+    <testcase name="PassingTest">
+    </testcase>
+    <testcase name="AssertTest">
+        <failure>SIGABRT: Abnormal termination</failure>
+    </testcase>
+    <testcase name="FailTest">
+        <failure>Fail reason</failure>
+    </testcase>
+    <testcase name="PassingRequireTest">
+    </testcase>
+    <testcase name="FailingRequireTest">
+        <failure>2+2 == 5 failed</failure>
+    </testcase>
+    <testcase name="SkipTest">
+        <skipped>Skip reason</failure>
+    </testcase>
+    <testcase name="TodoWithoutReasonTest">
+    </testcase>
+    <testcase name="TodoWithReasonTest">
+    </testcase>
+</testsuite>

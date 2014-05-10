@@ -13,3 +13,5 @@ LDFLAGS += $(DUMMY_A)
 : test_reporter.o cpp.o | $(DUMMY_A) |> !ldcxx |> cpp
 : test_reporter.o inline.o | $(DUMMY_A) |> !ldcc |> inline
 : test_reporter.o bdd.o | $(DUMMY_A) |> !ldcxx |> bdd
+: xml_reporter.o | $(DUMMY_A) |> !ldcxx |> xml_reporter
+: tap_reporter.o | $(DUMMY_A) |> !ldcxx |> tap_reporter

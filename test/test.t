@@ -17,9 +17,11 @@ function Test()
     fi
 }
 
-echo '1..5'
+echo '1..7'
 Test "core"
 Test "sandbox"
 Test "cpp"
 Test "inline"
 Test "bdd"
+Test "xml_reporter"
+Test "tap_reporter"
