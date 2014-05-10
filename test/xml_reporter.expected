@@ -1,4 +1,4 @@
-<testsuite dummys="8">
+<testsuite tests="8">
     <testcase name="PassingTest">
     </testcase>
     <testcase name="AssertTest">

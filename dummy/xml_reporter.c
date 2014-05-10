@@ -12,7 +12,7 @@ typedef struct
 static void began( void* ctx_ )
 {
     const Context* ctx = (Context*)ctx_;
-    fprintf(ctx->file, "<testsuite dummys=\"%d\">%s",
+    fprintf(ctx->file, "<testsuite tests=\"%d\">%s",
         dummyGetTestCount(),
         ctx->newline
     );
