@@ -70,8 +70,16 @@ typedef struct
     int currentTestIndex;
 } dummyContext;
 
+typedef struct
+{
+    dummyAbortHandler handler;
+    void* context;
+} dummyAbortHandlerInfo;
 
-dummyContext* dummyCurrentContext = NULL;
+
+static dummyContext* dummyCurrentContext = NULL;
+static dummyAbortHandlerInfo AbortStack[DUMMY_MAX_SANDBOX_DEPTH];
+static int AbortStackSize = 0;
 
 
 bool dummyRunTest( int index );
@@ -350,4 +358,28 @@ void dummyLog( const char* message, ... )
     va_end(args);
 
     ctx->reporter->log(ctx->reporter->context, formattedMessage);
+}
+
+void dummyPushAbortHandler( dummyAbortHandler handler, void* context )
+{
+    assert(AbortStackSize <= DUMMY_MAX_SANDBOX_DEPTH);
+    AbortStackSize++;
+    dummyAbortHandlerInfo* info = &AbortStack[AbortStackSize-1];
+
+    info->handler = handler;
+    info->context = context;
+}
+
+void dummyPopAbortHandler()
+{
+    assert(AbortStackSize >= 1);
+    AbortStackSize--;
+}
+
+void dummyAbortSandbox( int errorCode, const char* reason )
+{
+    assert(AbortStackSize >= 1);
+    dummyAbortHandlerInfo* info = &AbortStack[AbortStackSize-1];
+
+    info->handler(info->context, errorCode, reason);
 }

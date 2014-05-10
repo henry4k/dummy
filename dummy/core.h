@@ -1,8 +1,6 @@
 #ifndef __DUMMY_CORE_H__
 #define __DUMMY_CORE_H__
 
-#include "sandbox.h"
-
 
 #ifdef __cplusplus
 extern "C"
@@ -12,7 +10,17 @@ extern "C"
 
 enum
 {
-    DUMMY_UNKNOWN_TEST_COUNT = -1
+    DUMMY_UNKNOWN_TEST_COUNT = -1,
+    DUMMY_MAX_SANDBOX_DEPTH = 32
+};
+
+/**
+ * Standard error codes, that can be returned by #dummySandbox functions.
+ */
+enum
+{
+    DUMMY_SANDBOX_SUCCEEDED = 0,
+    DUMMY_SANDBOX_GENERIC_ERROR = 1
 };
 
 typedef enum
@@ -28,6 +36,36 @@ typedef enum
     DUMMY_SKIP_TEST
 } dummyTestAbortType;
 
+
+/**
+ * Can be called in a sandbox.
+ */
+typedef void (*dummySandboxableFunction)();
+
+/**
+ * Runs the given function and catches errors.
+ *
+ * @param abortReason
+ * If the protected call is aborted with a reason,
+ * the string pointer is passed here.
+ *
+ * @return
+ * Code that classifies the error.
+ * If the function ran successfully it returns #DUMMY_SANDBOX_SUCCEEDED.
+ * Custom error codes may be passed using #dummyAbortSandbox.
+ */
+typedef int (*dummySandbox)( dummySandboxableFunction fn, const char** abortReason );
+
+/**
+ * Aborts the current sandbox call.
+ *
+ * @param reason
+ * May be `NULL`.
+ *
+ * @return
+ * Doesn't return.
+ */
+typedef void (*dummyAbortHandler)( void* context, int errorCode, const char* reason );
 
 typedef void (*dummyCleanupFunction)( void* data );
 
@@ -147,11 +185,28 @@ void dummyAbortTest( dummyTestAbortType type, const char* reason, ... ); // TODO
  */
 void dummyMarkTestAsTodo( const char* reason, ... );
 
-
 /**
  * Reports a diagnostic message.
  */
 void dummyLog( const char* message, ... );
+
+/**
+ * Replaces the current abort implementation.
+ */
+void dummyPushAbortHandler( dummyAbortHandler implementation, void* context );
+
+/**
+ * Resets the current abort implementation to the last one or disables it.
+ */
+void dummyPopAbortHandler();
+
+/**
+ * Aborts the current sandbox using the current abort implementation.
+ *
+ * @note
+ * Trying to abort without an abort implementation will cause an fatal error.
+ */
+void dummyAbortSandbox( int errorCode, const char* reason );
 
 
 #ifdef __cplusplus

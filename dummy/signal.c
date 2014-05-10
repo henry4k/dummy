@@ -1,6 +1,6 @@
 #include <assert.h>
 
-#include "config.h"
+#include "core.h" // DUMMY_MAX_SANDBOX_DEPTH
 #include "signal.h"
 
 

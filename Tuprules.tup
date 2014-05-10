@@ -8,7 +8,7 @@ CXX = c++
 CFLAGS = -g -O0 --std=c11 -pedantic-errors -Wvla
 CXXFLAGS = --std=c++11
 
-ifdef CXX_MODE
+ifeq (@(CXX_MODE),y)
 !cc = |> $(CXX) -x c++ -c %f -o %o $(CFLAGS) $(CXXFLAGS) |> %B.o
 !ldcc = |> $(CXX) -o %o %f $(LDFLAGS) |>
 else

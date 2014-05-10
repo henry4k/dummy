@@ -1,9 +1,6 @@
 include_rules
 
-: config.h.in |> tup varsed %f %o |> config.h
-ORDER_DEPS = config.h
-
-: foreach *.c | $(ORDER_DEPS) |> !cc |> %B.o
-: foreach *.cpp | $(ORDER_DEPS) |> !cxx |> %B.o
+: foreach *.c |> !cc |> %B.o
+: foreach *.cpp |> !cxx |> %B.o
 
 : *.o |> !ar |> dummy.a

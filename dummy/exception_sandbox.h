@@ -1,12 +1,7 @@
 #ifndef __DUMMY_EXCEPTION_SANDBOX_H__
 #define __DUMMY_EXCEPTION_SANDBOX_H__
 
-#include "sandbox.h"
-#include "config.h"
-
-#if !defined(DUMMY_CXX_MODE)
-#warning "DUMMY_CXX_MODE is not defined, error descriptions may not be accurate."
-#endif
+#include "core.h"
 
 #ifdef __cplusplus
 extern "C"
