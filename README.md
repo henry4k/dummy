@@ -62,12 +62,14 @@ Because C++ exceptions can't be thrown through C code.
 For code examples, just take a look at the test directory.
 
 
+Author
+------
+
+- [Henry Kielmann](http://henry4k.de/)
+
+
 Licence
 -------
 
-*TODO*
-But probably a very permissive licence,
-that allows you to copy and modify the code to your needs.
-(MIT,BSD,zlib .. ?)
-
-Henry Kielmann
+This is free and unencumbered public domain software.
+For more information, see http://unlicense.org/ or the accompanying `UNLICENSE` file.
