@@ -1,19 +1,29 @@
-<testsuite tests="8">
+<testsuite tests="9">
     <testcase name="PassingTest">
+    </testcase>
+    <testcase name="LogTest">
+        <system-out>aaa</system-out>
+        <system-out>bbb</system-out>
+        <system-out>ccc</system-out>
     </testcase>
     <testcase name="AssertTest">
         <failure>SIGABRT: Abnormal termination</failure>
     </testcase>
     <testcase name="FailTest">
-        <failure>Fail reason</failure>
+        <failure>Fail reason
+multiple
+lines</failure>
     </testcase>
     <testcase name="PassingRequireTest">
     </testcase>
     <testcase name="FailingRequireTest">
-        <failure>2+2 == 5 failed</failure>
+        <failure>In reporter_shared_tests.h:35:
+2+2 == 5 failed</failure>
     </testcase>
     <testcase name="SkipTest">
-        <skipped>Skip reason</failure>
+        <skipped>Skip reason
+multiple
+lines</skipped>
     </testcase>
     <testcase name="TodoWithoutReasonTest">
     </testcase>

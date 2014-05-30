@@ -1,12 +1,23 @@
-1..8
+1..9
 ok 1 PassingTest
+# aaa
+# bbb
+# ccc
+ok 2 LogTest
 # SIGABRT: Abnormal termination
-not ok 2 AssertTest
+not ok 3 AssertTest
 # Fail reason
-not ok 3 FailTest
-ok 4 PassingRequireTest
+# multiple
+# lines
+not ok 4 FailTest
+ok 5 PassingRequireTest
+# In reporter_shared_tests.h:35:
 # 2+2 == 5 failed
-not ok 5 FailingRequireTest
-ok 6 SkipTest # SKIP Skip reason
-ok 7 TodoWithoutReasonTest # TODO
-ok 8 TodoWithReasonTest # TODO TODO reason
+not ok 6 FailingRequireTest
+ok 7 SkipTest # SKIP Skip reason
+multiple
+lines
+ok 8 TodoWithoutReasonTest # TODO
+ok 9 TodoWithReasonTest # TODO TODO reason
+multiple
+lines

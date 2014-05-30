@@ -294,7 +294,7 @@ const char* dummyGetTestTodoReason()
     return NULL;
 }
 
-const char* dummyFormatV( const char* format, va_list args )
+static char* dummyFormatV( const char* format, va_list args )
 {
     static char buffer[DUMMY_MAX_MESSAGE_LENGTH];
     vsprintf(buffer, format, args);
@@ -354,10 +354,25 @@ void dummyLog( const char* message, ... )
 
     va_list args;
     va_start(args, message);
-    const char* formattedMessage = dummyFormatV(message, args);
+    char* formattedMessage = dummyFormatV(message, args);
     va_end(args);
 
-    ctx->reporter->log(ctx->reporter->context, formattedMessage);
+    // separate into lines
+    const char* start = formattedMessage;
+    for(char* current = formattedMessage; ; ++current)
+    {
+        if(*current == '\n')
+        {
+            *current = '\0';
+            ctx->reporter->log(ctx->reporter->context, start);
+            start = current+1;
+        }
+        else if(*current == '\0')
+        {
+            ctx->reporter->log(ctx->reporter->context, start);
+            break;
+        }
+    }
 }
 
 void dummyPushAbortHandler( dummyAbortHandler handler, void* context )

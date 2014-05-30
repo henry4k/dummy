@@ -30,7 +30,8 @@ test done
 test number = 4
 test name = 'FailingRequireTest'
 test result = 'failed'
-test abort reason = '2+2 == 5 failed'
+test abort reason = 'In core.c:33:
+2+2 == 5 failed'
 test todo = 0
 test todo reason = '(null)'
 test done
