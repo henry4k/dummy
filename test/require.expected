@@ -1,0 +1,53 @@
+test count = 6
+test number = 0
+test name = 'SucceedTest'
+test result = 'passed'
+test abort reason = '(null)'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 1
+test name = 'RequireTest'
+test result = 'failed'
+test abort reason = 'In require.c:20:
+1+1 == 3 failed'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 2
+test name = 'RequireIntEqualsTest'
+test result = 'failed'
+test abort reason = 'In require.c:25:
+    3 == 1+1 failed
+was 3 == 2'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 3
+test name = 'RequireFloatEqualsTest'
+test result = 'failed'
+test abort reason = 'In require.c:30:
+    3+-0.01 == 1+1.009 failed
+was 3+-0.01 == 2.009'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 4
+test name = 'RequireStringEqualsTest'
+test result = 'failed'
+test abort reason = 'In require.c:35:
+    "foo bar" == "foo" "bar" failed
+was "foo bar" == "foobar"'
+test todo = 0
+test todo reason = '(null)'
+test done
+test number = 5
+test name = 'RequirePointerEqualsTest'
+test result = 'failed'
+test abort reason = 'In require.c:42:
+    ap == bp failed
+was 0x1 == (nil)'
+test todo = 0
+test todo reason = '(null)'
+test done
+testing done
