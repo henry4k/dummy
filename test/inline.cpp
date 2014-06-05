@@ -1,6 +1,6 @@
 #include <dummy/core.h>
-#include <dummy/exception_sandbox.h>
-#include <dummy/inline.h>
+#include <dummy/exception_sandbox.hpp>
+#include <dummy/inline.hpp>
 
 #include "test_reporter.h"
 

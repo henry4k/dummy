@@ -17,7 +17,7 @@ function Test()
     fi
 }
 
-echo '1..7'
+echo '1..8'
 Test "core"
 Test "sandbox"
 Test "cpp"

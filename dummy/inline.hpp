@@ -1,5 +1,5 @@
-#ifndef __DUMMY_INLINE_H__
-#define __DUMMY_INLINE_H__
+#ifndef __DUMMY_INLINE_HPP__
+#define __DUMMY_INLINE_HPP__
 
 #include "core.h"
 

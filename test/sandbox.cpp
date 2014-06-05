@@ -3,7 +3,7 @@
 #include <dummy/core.h>
 #include <dummy/require.h>
 #include <dummy/signal_sandbox.h>
-#include <dummy/exception_sandbox.h>
+#include <dummy/exception_sandbox.hpp>
 
 #include "test_reporter.h"
 
