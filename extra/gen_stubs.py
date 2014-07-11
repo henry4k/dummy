@@ -4,10 +4,6 @@ import re
 import os.path
 import argparse
 
-parser = argparse.ArgumentParser(description='Generate stubs for c functions.')
-parser.add_argument('module_header_name', metavar='module_header')
-args = parser.parse_args()
-
 class CParameter():
     def __init__(self, name, type):
         self.name = name
@@ -100,19 +96,21 @@ def write_cfunction_stub_pointer(function, file, extern):
 
 def write_cfunction_stub_implementation(function, file):
     implementation_template = \
-'''{return_type} {name}({parameters})
+'''{return_type} {name}({parameter_declarations})
 {{
     if(!{pointer_name})
-        dummyAbortTest("Brabbel");
-    return {pointer_name};
+        dummyAbortTest("Called {name} without stub callback.");
+    return {pointer_name}({parameter_names});
 }}
 '''
     pointer_name = get_cfunction_stub_pointer_name(function)
-    parameters = ', '.join(str(p) for p in function.parameters)
+    parameter_declarations = ', '.join(str(p) for p in function.parameters)
+    parameter_names = ', '.join(p.name for p in function.parameters)
     file.write(implementation_template.format(
         return_type=function.return_type,
         name=function.name,
-        parameters=parameters,
+        parameter_declarations=parameter_declarations,
+        parameter_names=parameter_names,
         pointer_name=pointer_name))
 
 def get_stub_header_name(name):
@@ -133,6 +131,7 @@ def write_stub_implementation(name, header_name, functions):
     file_name = get_stub_implementation_name(name)
     with open(file_name, 'w', encoding='UTF-8') as file:
         file.write('#include <stddef.h> // NULL\n')
+        file.write('#include <dummy/core.h> // dummyAbortTest\n')
         file.write('#include "{}"\n'.format(get_stub_header_name(name)))
         file.write('\n')
         for function in functions:
@@ -140,20 +139,29 @@ def write_stub_implementation(name, header_name, functions):
             write_cfunction_stub_implementation(function, file)
             file.write('\n')
 
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate stubs for C functions.')
+    parser.add_argument('headers',
+                        metavar='header',
+                        nargs='+')
+    args = parser.parse_args()
 
+    headers = args.headers
 
-module_header_name = args.module_header_name
-module_name = os.path.splitext(os.path.basename(module_header_name))[0]
+    for header in headers:
+        module_name = os.path.splitext(os.path.basename(header))[0]
 
-with open(module_header_name, 'r', encoding='UTF-8') as file:
-    functions = []
-    for line in file:
-        function = try_parse_cfunction(line)
-        if function:
-            functions.append(function)
+        with open(header, 'r', encoding='UTF-8') as file:
+            functions = []
+            for line in file:
+                function = try_parse_cfunction(line)
+                if function:
+                    functions.append(function)
+
         write_stub_header(name=module_name,
-                          header_name=module_header_name,
+                          header_name=header,
                           functions=functions)
+
         write_stub_implementation(name=module_name,
-                                  header_name=module_header_name,
+                                  header_name=header,
                                   functions=functions)
