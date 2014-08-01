@@ -38,18 +38,18 @@ class CFunction():
             ', '.join(repr(p) for p in self.parameters))
 
 parameter_pattern = re.compile(r'''
-    (?P<type>[^ ].+[^ ])
+    (?P<type> [a-zA-Z_:][a-zA-Z_:*0-9 ]+)
     \s+
-    (?P<name>[^ ]+)
+    (?P<name> [a-zA-Z_:]+)
     ''', re.VERBOSE)
 
 function_pattern = re.compile(r'''
-    (?P<return_type> [^ ].+[^ ] )
+    (?P<return_type> [a-zA-Z_:][a-zA-Z_:*0-9 ]+)
     \s+
-    (?P<name> [^ ]+ )
+    (?P<name> [a-zA-Z_:0-9]+)
     \s*
     \(
-    (?P<parameters> .* )
+    (?P<parameters> [a-zA-Z_:*0-9. ]*)
     \)
     \s*
     ;
@@ -67,6 +67,7 @@ def try_parse_cfunction(function_string):
     function_match = function_pattern.search(function_string)
     if function_match:
         name = function_match.group('name')
+
         return_type = function_match.group('return_type')
         parameters = list(parse_cparameters(function_match.group('parameters')))
         return CFunction(name=name,
@@ -99,7 +100,7 @@ def write_cfunction_stub_implementation(function, file):
 '''{return_type} {name}({parameter_declarations})
 {{
     if(!{pointer_name})
-        dummyAbortTest("Called {name} without stub callback.");
+        dummyAbortTest(DUMMY_FAIL_TEST, "Called {name} without stub callback.");
     return {pointer_name}({parameter_names});
 }}
 '''
@@ -113,26 +114,26 @@ def write_cfunction_stub_implementation(function, file):
         parameter_names=parameter_names,
         pointer_name=pointer_name))
 
-def get_stub_header_name(name):
+def get_stub_header_name(language, name):
     return name+'_stub.h'
 
-def get_stub_implementation_name(name):
-    return name+'_stub.c'
+def get_stub_implementation_name(language, name):
+    return name+'_stub.'+language
 
-def write_stub_header(name, header_name, functions):
-    file_name = get_stub_header_name(name)
+def write_stub_header(language, name, header_name, functions):
+    file_name = get_stub_header_name(language, name)
     with open(file_name, 'w', encoding='UTF-8') as file:
         file.write('#include "{}"\n'.format(header_name))
         file.write('\n')
         for function in functions:
             write_cfunction_stub_pointer(function, file, extern=True)
 
-def write_stub_implementation(name, header_name, functions):
-    file_name = get_stub_implementation_name(name)
+def write_stub_implementation(language, name, functions):
+    file_name = get_stub_implementation_name(language, name)
     with open(file_name, 'w', encoding='UTF-8') as file:
         file.write('#include <stddef.h> // NULL\n')
         file.write('#include <dummy/core.h> // dummyAbortTest\n')
-        file.write('#include "{}"\n'.format(get_stub_header_name(name)))
+        file.write('#include "{}"\n'.format(get_stub_header_name(language, name)))
         file.write('\n')
         for function in functions:
             write_cfunction_stub_pointer(function, file, extern=False)
@@ -141,11 +142,15 @@ def write_stub_implementation(name, header_name, functions):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate stubs for C functions.')
+    parser.add_argument('--lang',
+                        default='c',
+                        choices=['c','cpp'])
     parser.add_argument('headers',
                         metavar='header',
                         nargs='+')
     args = parser.parse_args()
 
+    lang = args.lang
     headers = args.headers
 
     for header in headers:
@@ -158,10 +163,11 @@ if __name__ == '__main__':
                 if function:
                     functions.append(function)
 
-        write_stub_header(name=module_name,
+        write_stub_header(language=lang,
+                          name=module_name,
                           header_name=header,
                           functions=functions)
 
-        write_stub_implementation(name=module_name,
-                                  header_name=header,
+        write_stub_implementation(language=lang,
+                                  name=module_name,
                                   functions=functions)
