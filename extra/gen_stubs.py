@@ -49,11 +49,11 @@ function_pattern = re.compile(r'''
     (?P<name> [a-zA-Z_:0-9]+)
     \s*
     \(
-    (?P<parameters> [a-zA-Z_:*0-9. ]*)
+    (?P<parameters> [a-zA-Z_:*0-9, ]*)
     \)
     \s*
     ;
-    ''', re.VERBOSE)
+    ''', re.VERBOSE) # No support for varargs so far!
 
 def parse_cparameters(parameters):
     for parameter_string in parameters.split(','):
