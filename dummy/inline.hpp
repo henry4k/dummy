@@ -26,13 +26,17 @@ void dummyAddInlineTests();
 
 int dummyAddInlineTest_( const char* name, dummySandbox sandbox, dummySandboxableFunction fn );
 
-#define DUMMY_INLINE_TEST_CONCAT_HELPER_( A, B, C ) A ## B ## C
-#define DUMMY_INLINE_TEST_CONCAT_( A, B, C ) DUMMY_INLINE_TEST_CONCAT_HELPER_(A, B, C)
+#define DUMMY_INLINE_TEST_CONCAT_2_HELPER_( A, B ) A ## B
+#define DUMMY_INLINE_TEST_CONCAT_2_( A, B ) DUMMY_INLINE_TEST_CONCAT_2_HELPER_(A, B)
+
+#define DUMMY_INLINE_TEST_CONCAT_3_HELPER_( A, B, C ) A ## B ## C
+#define DUMMY_INLINE_TEST_CONCAT_3_( A, B, C ) DUMMY_INLINE_TEST_CONCAT_3_HELPER_(A, B, C)
 
 #define DUMMY_INLINE_TEST_( Name, Sandbox ) \
-    static void DUMMY_INLINE_TEST_CONCAT_(test_at_line_, __LINE__,) (); \
-    static int DUMMY_INLINE_TEST_CONCAT_(test_at_line_, __LINE__, _registered) \
-        = dummyAddInlineTest_(Name, Sandbox, DUMMY_INLINE_TEST_CONCAT_(test_at_line_, __LINE__,)); \
-    static void DUMMY_INLINE_TEST_CONCAT_(test_at_line_, __LINE__,) ()
+    static void DUMMY_INLINE_TEST_CONCAT_2_(test_at_line_, __LINE__) (); \
+    int DUMMY_INLINE_TEST_CONCAT_3_(test_at_line_, __LINE__, _registered) \
+        = dummyAddInlineTest_(Name, Sandbox, DUMMY_INLINE_TEST_CONCAT_2_(test_at_line_, __LINE__)); \
+    static void DUMMY_INLINE_TEST_CONCAT_2_(test_at_line_, __LINE__) ()
+
 
 #endif

@@ -184,7 +184,8 @@ bool dummyRunTest( int index )
         strncpy(test->abortReason, abortReason, DUMMY_MAX_MESSAGE_LENGTH);
     test->status = DUMMY_TEST_COMPLETED;
 
-    for(int i = 0; i < test->cleanupStackSize; i++)
+    int i = 0;
+    for(; i < test->cleanupStackSize; i++)
     {
         dummyCleanup* cleanup = &test->cleanupStack[i];
         cleanup->fn(cleanup->data);
@@ -294,7 +295,7 @@ const char* dummyGetTestTodoReason()
     return NULL;
 }
 
-static char* dummyFormatV( const char* format, va_list args )
+const char* dummyFormatV( const char* format, va_list args )
 {
     static char buffer[DUMMY_MAX_MESSAGE_LENGTH];
     vsprintf(buffer, format, args);
@@ -354,25 +355,10 @@ void dummyLog( const char* message, ... )
 
     va_list args;
     va_start(args, message);
-    char* formattedMessage = dummyFormatV(message, args);
+    const char* formattedMessage = dummyFormatV(message, args);
     va_end(args);
 
-    // separate into lines
-    const char* start = formattedMessage;
-    for(char* current = formattedMessage; ; ++current)
-    {
-        if(*current == '\n')
-        {
-            *current = '\0';
-            ctx->reporter->log(ctx->reporter->context, start);
-            start = current+1;
-        }
-        else if(*current == '\0')
-        {
-            ctx->reporter->log(ctx->reporter->context, start);
-            break;
-        }
-    }
+    ctx->reporter->log(ctx->reporter->context, formattedMessage);
 }
 
 void dummyPushAbortHandler( dummyAbortHandler handler, void* context )
