@@ -5,4 +5,5 @@ project('dummy',
         meson_version: '>=0.49')
 
 subdir('dummy')
-#subdir('test')
+subdir('extra')
+subdir('test')

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.3
 
 import re
+import sys
 import os.path
 import argparse
 
@@ -38,41 +39,67 @@ class CFunction():
             ', '.join(repr(p) for p in self.parameters))
 
 parameter_pattern = re.compile(r'''
-    (?P<type>[^ ].+[^ ])
+    (?P<type> [a-zA-Z_:][a-zA-Z_:*0-9 ]+)
     \s+
-    (?P<name>[^ ]+)
+    (?P<name> [a-zA-Z_:]+)
     ''', re.VERBOSE)
 
 function_pattern = re.compile(r'''
-    (?P<return_type> [^ ].+[^ ] )
+    ^\s*
+    (?P<return_type> [a-zA-Z_:][a-zA-Z_:*0-9 ]+)
     \s+
-    (?P<name> [^ ]+ )
+    (?P<name> [a-zA-Z_:0-9]+)
     \s*
     \(
-    (?P<parameters> .* )
+    (?P<parameters> [^()]*)
     \)
     \s*
-    ;
+    ;\s*$
     ''', re.VERBOSE)
+#typedef void (*LogHandler)( LogLevel level, const char* line );
+
+class_pattern = re.compile(r'^\s*class\s*')
+
+log_filter = {}
+
+def log(type, format, *args):
+    if type in log_filter:
+        return
+    else:
+        message = str.format(format, *args)
+        output = sys.stdout
+        if type != 'INFO':
+            output = sys.stderr
+        print(str.format('{}: {}', type, message), file=output)
 
 def parse_cparameters(parameters):
     for parameter_string in parameters.split(','):
+        parameter_string = parameter_string.strip()
         parameter_match = parameter_pattern.search(parameter_string)
         if parameter_match:
             name = parameter_match.group('name')
             type = parameter_match.group('type')
             yield CParameter(name=name, type=type)
+        elif parameter_string == '':
+            continue
+        elif parameter_string == '...':
+            raise RuntimeError('Functions with variadic arguments can\'t be stubbed.')
+        else:
+            raise RuntimeError('Can\'t parse parameter: "'+parameter_string+'" (This is probably a bug.)')
 
 def try_parse_cfunction(function_string):
     function_match = function_pattern.search(function_string)
     if function_match:
         name = function_match.group('name')
+
         return_type = function_match.group('return_type')
         parameters = list(parse_cparameters(function_match.group('parameters')))
         return CFunction(name=name,
                          return_type=return_type,
                          parameters=parameters)
     else:
+        if class_pattern.match(function_string):
+            raise RuntimeError('Found a class definition. Methods can\'t be stubbed yet.')
         return None
 
 def get_cfunction_stub_pointer_name(function):
@@ -99,7 +126,7 @@ def write_cfunction_stub_implementation(function, file):
 '''{return_type} {name}({parameter_declarations})
 {{
     if(!{pointer_name})
-        dummyAbortTest("Called {name} without stub callback.");
+        dummyAbortTest(DUMMY_FAIL_TEST, "Called {name} without stub callback.");
     return {pointer_name}({parameter_names});
 }}
 '''
@@ -113,26 +140,26 @@ def write_cfunction_stub_implementation(function, file):
         parameter_names=parameter_names,
         pointer_name=pointer_name))
 
-def get_stub_header_name(name):
+def get_stub_header_name(language, name):
     return name+'_stub.h'
 
-def get_stub_implementation_name(name):
-    return name+'_stub.c'
+def get_stub_implementation_name(language, name):
+    return name+'_stub.'+language
 
-def write_stub_header(name, header_name, functions):
-    file_name = get_stub_header_name(name)
+def write_stub_header(language, name, header_name, functions):
+    file_name = get_stub_header_name(language, name)
     with open(file_name, 'w', encoding='UTF-8') as file:
         file.write('#include "{}"\n'.format(header_name))
         file.write('\n')
         for function in functions:
             write_cfunction_stub_pointer(function, file, extern=True)
 
-def write_stub_implementation(name, header_name, functions):
-    file_name = get_stub_implementation_name(name)
+def write_stub_implementation(language, name, functions):
+    file_name = get_stub_implementation_name(language, name)
     with open(file_name, 'w', encoding='UTF-8') as file:
         file.write('#include <stddef.h> // NULL\n')
         file.write('#include <dummy/core.h> // dummyAbortTest\n')
-        file.write('#include "{}"\n'.format(get_stub_header_name(name)))
+        file.write('#include "{}"\n'.format(get_stub_header_name(language, name)))
         file.write('\n')
         for function in functions:
             write_cfunction_stub_pointer(function, file, extern=False)
@@ -141,11 +168,19 @@ def write_stub_implementation(name, header_name, functions):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate stubs for C functions.')
+    parser.add_argument('-q', '--quiet',
+                        action='store_true')
+    parser.add_argument('--lang',
+                        default='c',
+                        choices=['c','cpp'])
     parser.add_argument('headers',
                         metavar='header',
                         nargs='+')
     args = parser.parse_args()
 
+    if args.quiet:
+        log_filter['INFO'] = True
+    lang = args.lang
     headers = args.headers
 
     for header in headers:
@@ -153,15 +188,21 @@ if __name__ == '__main__':
 
         with open(header, 'r', encoding='UTF-8') as file:
             functions = []
-            for line in file:
-                function = try_parse_cfunction(line)
-                if function:
-                    functions.append(function)
+            for line_number, line in enumerate(file):
+                location = str.format('{}:{}', header, line_number+1)
+                try:
+                    function = try_parse_cfunction(line)
+                    if function:
+                        functions.append(function)
+                        log('INFO', '{} Found {}', location, function)
+                except RuntimeError as error:
+                    log('WARN', '{} {}', location, error)
 
-        write_stub_header(name=module_name,
+        write_stub_header(language=lang,
+                          name=module_name,
                           header_name=header,
                           functions=functions)
 
-        write_stub_implementation(name=module_name,
-                                  header_name=header,
+        write_stub_implementation(language=lang,
+                                  name=module_name,
                                   functions=functions)
