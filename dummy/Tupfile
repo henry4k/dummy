@@ -1,6 +1,0 @@
-include_rules
-
-: foreach *.c |> !cc |> %B.o
-: foreach *.cpp |> !cxx |> %B.o
-
-: *.o |> !ar |> dummy.a

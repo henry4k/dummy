@@ -1,0 +1,4 @@
+option('support_cpp',
+       description: 'Compile with C++ support',
+       type: 'feature',
+       value: 'auto')
