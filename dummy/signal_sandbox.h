@@ -12,7 +12,7 @@ extern "C"
  * Run `fn` in a sandbox, that catches signals.
  * @see dummySandbox
  */
-int dummySignalSandbox( dummySandboxableFunction fn, const char** abortReason );
+DUMMY_API int dummySignalSandbox( dummySandboxableFunction fn, const char** abortReason );
 
 #ifdef __cplusplus
 }

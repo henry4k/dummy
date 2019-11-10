@@ -20,7 +20,7 @@ extern "C"
  * @param file
  * The report is written to `file`.
  */
-const dummyReporter* dummyGetTAPReporter( FILE* file );
+DUMMY_API const dummyReporter* dummyGetTAPReporter( FILE* file );
 
 #ifdef __cplusplus
 }

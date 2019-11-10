@@ -98,7 +98,7 @@ static void completedTest( void* ctx_ )
     );
 }
 
-static void log( void* ctx_, const char* message )
+static void logMessage( void* ctx_, const char* message )
 {
     const Context* ctx = (Context*)ctx_;
     fprintf(ctx->file, "%s%s<system-out>%s</system-out>%s",
@@ -123,7 +123,7 @@ const dummyReporter* dummyGetXMLReporter( FILE* file, const char* tab, const cha
     reporter.completed = completed;
     reporter.beganTest = beganTest;
     reporter.completedTest = completedTest;
-    reporter.log = log;
+    reporter.log = logMessage;
 
     return &reporter;
 }

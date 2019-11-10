@@ -7,6 +7,6 @@
  * Run `fn` in a sandbox, that catches exceptions and signals.
  * @see dummySandbox
  */
-int dummyExceptionSandbox( dummySandboxableFunction fn, const char** abortReason );
+DUMMY_API int dummyExceptionSandbox( dummySandboxableFunction fn, const char** abortReason );
 
 #endif

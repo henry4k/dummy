@@ -6,7 +6,7 @@
 /**
  * Adds all defined inline tests to the context.
  */
-void dummyAddInlineTests();
+DUMMY_API void dummyAddInlineTests();
 
 /**
  * Defines an inline test.
@@ -24,7 +24,7 @@ void dummyAddInlineTests();
 
 // --- implementation ---
 
-int dummyAddInlineTest_( const char* name, dummySandbox sandbox, dummySandboxableFunction fn );
+DUMMY_API int dummyAddInlineTest_( const char* name, dummySandbox sandbox, dummySandboxableFunction fn );
 
 #define DUMMY_INLINE_TEST_CONCAT_2_HELPER_( A, B ) A ## B
 #define DUMMY_INLINE_TEST_CONCAT_2_( A, B ) DUMMY_INLINE_TEST_CONCAT_2_HELPER_(A, B)

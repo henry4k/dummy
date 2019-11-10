@@ -16,10 +16,12 @@ static void began( void* ctx_ )
 
 static void completed( void* ctx_ )
 {
+    (void)ctx_; // mark as unused
 }
 
 static void beganTest( void* ctx_ )
 {
+    (void)ctx_; // mark as unused
 }
 
 static const char* dummyTestResultToTAPString( dummyTestResult result )
@@ -37,7 +39,7 @@ static const char* dummyTestResultToTAPString( dummyTestResult result )
     }
 }
 
-static void log( void* ctx_, const char* message )
+static void logMessage( void* ctx_, const char* message )
 {
     const Context* ctx = (Context*)ctx_;
 
@@ -72,7 +74,7 @@ static void completedTest( void* ctx_ )
 
     if(result == DUMMY_TEST_FAILED && abortReason)
     {
-        log(ctx, abortReason);
+        logMessage(ctx, abortReason);
     }
 
     fprintf(ctx->file, "%s %d %s",
@@ -110,7 +112,7 @@ const dummyReporter* dummyGetTAPReporter( FILE* file )
     reporter.completed = completed;
     reporter.beganTest = beganTest;
     reporter.completedTest = completedTest;
-    reporter.log = log;
+    reporter.log = logMessage;
 
     return &reporter;
 }

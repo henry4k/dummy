@@ -1,6 +1,34 @@
 #ifndef __DUMMY_CORE_H__
 #define __DUMMY_CORE_H__
 
+// Generic helper definitions for shared library support
+#if defined _WIN32 || defined __CYGWIN__
+    #define _DUMMY_IMPORT __declspec(dllimport)
+    #define _DUMMY_EXPORT __declspec(dllexport)
+#else
+    #if __GNUC__ >= 4
+        #define _DUMMY_IMPORT __attribute__ ((visibility ("default")))
+        #define _DUMMY_EXPORT __attribute__ ((visibility ("default")))
+    #else
+        #define _DUMMY_IMPORT
+        #define _DUMMY_EXPORT
+    #endif
+#endif
+
+// Now we use the generic helper definitions above to define DUMMY_API.
+// DUMMY_API is used for the public API symbols. It either DLL imports or
+// DLL exports (or does nothing for static build)
+
+#ifdef DUMMY_SHARED // defined if DUMMY is compiled as a DLL
+    #ifdef DUMMY_BUILDING_SHARED // defined if we are building the DUMMY DLL (instead of using it)
+        #define DUMMY_API _DUMMY_EXPORT
+    #else
+        #define DUMMY_API _DUMMY_IMPORT
+    #endif // DUMMY_BUILDING_SHARED
+#else // DUMMY_SHARED is not defined: this means DUMMY is a static lib.
+    #define DUMMY_API
+#endif
+
 
 #ifdef __cplusplus
 extern "C"
@@ -92,7 +120,7 @@ typedef struct
  * @param reporter
  * Reporter which will be used by the created context.
  */
-void dummyInit( const dummyReporter* reporter );
+DUMMY_API void dummyInit( const dummyReporter* reporter );
 
 /**
  * Runs all added tests and destroys the current context.
@@ -100,7 +128,7 @@ void dummyInit( const dummyReporter* reporter );
  * @return
  * Number of tests, that failed.
  */
-int dummyRunTests();
+DUMMY_API int dummyRunTests();
 
 /**
  * Adds a test to the current context.
@@ -116,33 +144,33 @@ int dummyRunTests();
  *
  * @see dummyRunTests
  */
-void dummyAddTest( const char* name, dummySandbox sandbox, dummySandboxableFunction fn );
+DUMMY_API void dummyAddTest( const char* name, dummySandbox sandbox, dummySandboxableFunction fn );
 
 /**
  * Count of tests added to the current context.
  */
-int dummyGetTestCount();
+DUMMY_API int dummyGetTestCount();
 
 /**
  * Name of the active test in the current context.
  */
-const char* dummyGetTestName();
+DUMMY_API const char* dummyGetTestName();
 
 /**
  * Id of the active test in the current context.
  */
-int dummyGetTestNumber();
+DUMMY_API int dummyGetTestNumber();
 
 /**
  * TODO
  */
-dummyTestResult dummyGetTestResult();
+DUMMY_API dummyTestResult dummyGetTestResult();
 
 /**
  * Message describing why the current test aborted
  * or `NULL` if the test hasn't failed (yet).
  */
-const char* dummyGetTestAbortReason();
+DUMMY_API const char* dummyGetTestAbortReason();
 
 /**
  * Adds a cleanup function to the current test.
@@ -150,15 +178,15 @@ const char* dummyGetTestAbortReason();
  * @param data
  * Data pointer that is passed to the cleanup function.
  */
-void dummyAddCleanup( dummyCleanupFunction fn, void* data );
+DUMMY_API void dummyAddCleanup( dummyCleanupFunction fn, void* data );
 
-int dummyTestIsMarkedAsTodo();
+DUMMY_API int dummyTestIsMarkedAsTodo();
 
 /**
  * If set, it returns the reason why the current test has been marked as TODO.
  * May be `NULL` if no reason has been given.
  */
-const char* dummyGetTestTodoReason();
+DUMMY_API const char* dummyGetTestTodoReason();
 
 /**
  * Aborts current test with the given reason.
@@ -170,7 +198,7 @@ const char* dummyGetTestTodoReason();
  * @return
  * Doesn't return.
  */
-void dummyAbortTest( dummyTestAbortType type, const char* reason, ... ); // TODO: Can be replaced with dummyAbortSandbox
+DUMMY_API void dummyAbortTest( dummyTestAbortType type, const char* reason, ... ); // TODO: Can be replaced with dummyAbortSandbox
 
 /**
  * Marks current test as TODO.
@@ -184,22 +212,22 @@ void dummyAbortTest( dummyTestAbortType type, const char* reason, ... ); // TODO
  * Calling this function more than once in a test,
  * may overwrite the previous TODO reason.
  */
-void dummyMarkTestAsTodo( const char* reason, ... );
+DUMMY_API void dummyMarkTestAsTodo( const char* reason, ... );
 
 /**
  * Reports a diagnostic message.
  */
-void dummyLog( const char* message, ... );
+DUMMY_API void dummyLog( const char* message, ... );
 
 /**
  * Replaces the current abort implementation.
  */
-void dummyPushAbortHandler( dummyAbortHandler implementation, void* context );
+DUMMY_API void dummyPushAbortHandler( dummyAbortHandler implementation, void* context );
 
 /**
  * Resets the current abort implementation to the last one or disables it.
  */
-void dummyPopAbortHandler();
+DUMMY_API void dummyPopAbortHandler();
 
 /**
  * Aborts the current sandbox using the current abort implementation.
@@ -207,7 +235,7 @@ void dummyPopAbortHandler();
  * @note
  * Trying to abort without an abort implementation will cause an fatal error.
  */
-void dummyAbortSandbox( int errorCode, const char* reason );
+DUMMY_API void dummyAbortSandbox( int errorCode, const char* reason );
 
 
 #ifdef __cplusplus

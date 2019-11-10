@@ -26,7 +26,7 @@ extern "C"
  * @param newline
  * Character sequence that is used to separate lines.
  */
-const dummyReporter* dummyGetXMLReporter( FILE* file, const char* tab, const char* newline );
+DUMMY_API const dummyReporter* dummyGetXMLReporter( FILE* file, const char* tab, const char* newline );
 
 #ifdef __cplusplus
 }

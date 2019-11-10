@@ -1,7 +1,7 @@
 #include <stddef.h> // NULL
 #include <exception>
 
-#include "signal.h"
+#include "signal_utils.h"
 #include "exception_sandbox.hpp"
 
 
@@ -20,6 +20,7 @@ public:
 
 static void abortHandler( void* context, int errorCode, const char* reason )
 {
+    (void)context; // mark as unused
     throw AbortError(errorCode, reason);
 }
 

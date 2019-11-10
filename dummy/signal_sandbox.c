@@ -4,7 +4,7 @@
 #include <assert.h>
 
 
-#include "signal.h"
+#include "signal_utils.h"
 #include "signal_sandbox.h"
 
 
